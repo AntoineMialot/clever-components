@@ -245,6 +245,23 @@ export const translations = {
   //#region cc-error
   'cc-error.ok': `OK`,
   //#endregion
+  //#region cc-grafana-info
+  'cc-grafana-info.disable': `Disable`,
+  'cc-grafana-info.disable-description': `Disabling grafana will end  your access to this Grafana organization`,
+  'cc-grafana-info.disable-title': `Disable Grafana`,
+  'cc-grafana-info.enable': `Enable`,
+  'cc-grafana-info.enable-description': `Enabling grafana will give you access to a Grafana organization to view this Clever Cloud organisation's applications runtimes and add-on metrics`,
+  'cc-grafana-info.enable-title': `Enable Grafana`,
+  'cc-grafana-info.error': `Something went wrong while loading add-ons linked to this application.`,
+  'cc-grafana-info.images-title': `Available dashboards samples`,
+  'cc-grafana-info.info': `Beta`,
+  'cc-grafana-info.link.doc': `Read the documentation`,
+  'cc-grafana-info.link.grafana': `Open Grafana`,
+  'cc-grafana-info.refresh': `Refresh`,
+  'cc-grafana-info.refresh-description': `Clicking on refresh, will reset all clever cloud template dashboard to their initial state`,
+  'cc-grafana-info.refresh-title': `Refresh dashboards`,
+  'cc-grafana-info.text': `This add-on is used to visualise Clever Cloud Metrics data. You can find the documentation and details about this service below.`,
+  //#endregion
   //#region cc-header-addon
   'cc-header-addon.creation-date': `Creation date`,
   'cc-header-addon.creation-date.full': ({ date }) => formatDate(lang, date),
