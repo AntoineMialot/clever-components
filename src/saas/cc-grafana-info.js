@@ -13,6 +13,9 @@ const infoSvg = new URL('../assets/info.svg', import.meta.url).href;
 
 const GRAFANA_LOGO_URL = 'https://static-assets.cellar.services.clever-cloud.com/logos/grafana.svg';
 const GRAFANA_DOCUMENTATION = 'https://www.clever-cloud.com/doc/addons/elastic/';
+const GRAFANA_ORG_SCREEN = new URL('../assets/organization.png', import.meta.url).href;
+const GRAFANA_APPLICATION_SCREEN = new URL('../assets/application.png', import.meta.url).href;
+const GRAFANA_ADDON_SCREEN = new URL('../assets/addon.png', import.meta.url).href;
 
 /**
  * A component to display various links (Documentation, kibana, APM) for an grafana service.
@@ -33,18 +36,18 @@ const GRAFANA_DOCUMENTATION = 'https://www.clever-cloud.com/doc/addons/elastic/'
  *
  * ```js
  * interface Dashboards {
+ *   description: string,
  *   title: string,
- *   url: URL,
+ *   url: string,
  * }
  * ```
  *
  * @cssdisplay grid
  *
- * @prop {Boolean} error - Display an error message.
  * @prop {Boolean} dashboardError - Display an error message due when cann't load dashboards screens.
+ * @prop {Boolean} error - Display an error message.
  * @prop {Link[]} links - Sets the different links.
  * @prop {Boolean} enabled - When Grafana is enabled.
- * @prop {Dashboards[]} dashboards - Sets the different dashboard images.
  *
  * @event {CustomEvent} cc-grafana-info:enable-grafana - Fires when the enable button is clicked.
  * @event {CustomEvent} cc-grafana-info:refresh-grafana - Fires when the refresh button is clicked.
@@ -59,12 +62,9 @@ export class CcGrafanaInfo extends LitElement {
       error: { type: Boolean, attribute: 'error' },
       // TODO: you need attribute with kebab case when it's more than one word
       // TODO: => dashboard-error
-      dashboardError: { type: Boolean, attribute: 'dashboardError' },
+      dashboardError: { type: Boolean, attribute: 'dashboard-error' },
       enabled: { type: Boolean, attribute: 'enabled' },
       links: { type: Array, attribute: 'links' },
-      // TODO: the component knows which dashbaords it needs to display (we don't need this public property)
-      // TODO: move the dashboards from the story directly in the component
-      dashboards: { type: Array, attribute: 'dashboards' },
     };
   }
 
@@ -90,29 +90,29 @@ export class CcGrafanaInfo extends LitElement {
   render () {
     // TODO: you can use the ?? operator instead of || now
     const links = this.links ?? [];
-    const dashboards = this.dashboards ?? [];
     const grafanaLink = links.find(({ type }) => type === 'grafana');
     const isFormDisabled = (this.error !== false) ?? this.saving;
+    const dashboards = [
+      { title: 'cc-grafana-info.organization-title', url: GRAFANA_ORG_SCREEN, description: 'cc-grafana-info.organization-description' },
+      { title: 'cc-grafana-info.runtime-title', url: GRAFANA_APPLICATION_SCREEN, description: 'cc-grafana-info.runtime-description' },
+      { title: 'cc-grafana-info.addon-title', url: GRAFANA_ADDON_SCREEN, description: 'cc-grafana-info.addon-description' },
+    ];
 
     return html`
 
       <cc-block>
 
-        <div slot="title" style="font-weight: bold;">Metrics on Grafana</div>
+        <div slot="title" style="font-weight: bold;">${i18n('cc-grafana-info.main-title')}</div>
         
-<!--        <div class="info-ribbon">${i18n('cc-grafana-info.info')}</div>-->
-  
-        ${!this.error ? html`
-        <cc-block-section>
-            <div slot="info">${i18n('cc-grafana-info.text')}</div>
-          
-          ${!this.enabled ? html`
-            <cc-flex-gap class="link-list">
-                ${ccLink(GRAFANA_DOCUMENTATION, html`
-                  <cc-img src="${infoSvg}"></cc-img><span>${i18n('cc-grafana-info.link.doc')}</span>
-                `)}
-              </cc-flex-gap>
-          ` : ''}
+        ${!this.error ? html`  
+          <cc-block-section>
+            <div slot="title">${i18n('cc-grafana-info.documentation-title')}</div>
+            <div slot="info">${i18n('cc-grafana-info.documentation-description')}</div>
+            <div>
+              ${ccLink(GRAFANA_DOCUMENTATION, html`
+                <cc-img src="${infoSvg}"></cc-img><span>${i18n('cc-grafana-info.link.doc')}</span>
+              `)}
+            </div>
           </cc-block-section>
           
           ${!this.enabled ? html`
@@ -127,16 +127,17 @@ export class CcGrafanaInfo extends LitElement {
           
   
           ${this.enabled ? html`
-            <cc-flex-gap class="link-list">
-              ${ccLink(GRAFANA_DOCUMENTATION, html`
-                <cc-img src="${infoSvg}"></cc-img><span>${i18n('cc-grafana-info.link.doc')}</span>
-              `)}
-              ${grafanaLink != null ? html`
-                ${ccLink(grafanaLink.href, html`
-                  <cc-img src="${GRAFANA_LOGO_URL}"></cc-img><span class="${classMap({ skeleton: (grafanaLink.href == null) })}">${i18n('cc-grafana-info.link.grafana')}</span>
-                `)}
-              ` : ''}
-            </cc-flex-gap>
+            <cc-block-section>
+              <div slot="title">${i18n('cc-grafana-info.grafana-link-title')}</div>
+              <div slot="info">${i18n('cc-grafana-info.grafana-link-description')}</div>
+              <div>
+                ${grafanaLink != null ? html`
+                  ${ccLink(grafanaLink.href, html`
+                    <cc-img src="${GRAFANA_LOGO_URL}"></cc-img><span class="${classMap({ skeleton: (grafanaLink.href == null) })}">${i18n('cc-grafana-info.link.grafana')}</span>
+                  `)}
+                ` : ''}
+              </div>
+            </cc-block-section>
   
             <cc-block-section>
               <div slot="title">${i18n('cc-grafana-info.refresh-title')}</div>
@@ -163,18 +164,14 @@ export class CcGrafanaInfo extends LitElement {
 
               <div>
                 ${ccLink(item.url, html`
-                    <cc-img src="${item.url}" style="height: 20rem; width: 40rem;"></cc-img>
+                    <cc-img .src="${item.url}" style="height: 20rem; width: 40rem;"></cc-img>
                   `)}
               </div>
               <div  slot="title">
-                <span>${item.title}</span>
+                <span>${i18n(item.title)}</span>
               </div>
               <div  slot="info">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                Quisque feugiat dui at leo porta dignissim.
-                Etiam ut purus ultrices, pulvinar tellus quis, cursus massa.
-                Mauris dignissim accumsan ex, at vestibulum lectus fermentum id.
-                Quisque nec magna arcu.
+                <span>${i18n(item.description)}</span>
               </div>
 
             </cc-block-section>

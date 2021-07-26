@@ -17,21 +17,16 @@ const conf = {
 };
 
 const grafanaLink = { type: 'grafana', href: 'https://my-grafana.com' };
-const grafanaOrg = new URL('../assets/organization.png', import.meta.url);
-const grafanaApplication = new URL('../assets/application.png', import.meta.url);
-const grafanaAddon = new URL('../assets/addon.png', import.meta.url);
 
 export const defaultStory = makeStory(conf, {
   items: [{
     links: [grafanaLink],
-    dashboards: [{ title: 'Organization', url: grafanaOrg }, { title: 'Application runtime', url: grafanaApplication }, { title: 'Application addon', url: grafanaAddon }],
   }],
 });
 
 export const disabled = makeStory(conf, {
   items: [{
     links: [grafanaLink],
-    dashboards: [{ title: 'Organization', url: grafanaOrg }, { title: 'Application runtime', url: grafanaApplication }, { title: 'Application addon', url: grafanaAddon }],
     enabled: false,
   }],
 });
@@ -39,15 +34,14 @@ export const disabled = makeStory(conf, {
 export const enabled = makeStory(conf, {
   items: [{
     links: [grafanaLink],
-    dashboards: [{ title: 'Organization', url: grafanaOrg }, { title: 'Application runtime', url: grafanaApplication }, { title: 'Application addon', url: grafanaAddon }],
     enabled: true,
   }],
 });
 
 export const simulations = makeStory(conf, {
   items: [
-    { links: [{ type: 'grafana' }], images: [grafanaOrg, grafanaApplication, grafanaAddon], enabled: true },
-    { dashboards: [{ title: 'Organization', url: grafanaOrg }, { title: 'Application runtime', url: grafanaApplication }, { title: 'Application addon', url: grafanaAddon }] },
+    { links: [{ type: 'grafana' }], enabled: true },
+    { },
   ],
   simulations: [
     storyWait(2000, ([component, componentError]) => {
