@@ -259,8 +259,6 @@ export const translations = {
   'cc-grafana-info.error': `Something went wrong while loading add-ons linked to this application.`,
   'cc-grafana-info.grafana-link-description': `Link to the Grafana which contains Clever Cloud metrics dashboards`,
   'cc-grafana-info.grafana-link-title': `Grafana`,
-  'cc-grafana-info.images-title': `Available dashboards samples`,
-  'cc-grafana-info.info': `Beta`,
   'cc-grafana-info.link.doc': `Read the documentation`,
   'cc-grafana-info.link.grafana': `Open Grafana`,
   'cc-grafana-info.main-title': `Metrics on Grafana`,

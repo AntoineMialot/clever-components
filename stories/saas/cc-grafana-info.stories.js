@@ -18,10 +18,46 @@ const conf = {
 
 const grafanaLink = { type: 'grafana', href: 'https://my-grafana.com' };
 
+// On a besoin de quelles stories:
+// * je sais pas encore si l'orga a le grafana disabled ou enabled => loading
+//   * => un cc-loader + message entre doc et screenshots
+// * j'ai des données (est-ce que disabled ou enabled)
+//   * dataLoadedWithEnabled
+//   * dataLoadedWithDisabled
+// * error chargement des données
+//   * => le message d'erreur entre doc et screenshots
+// * je suis en train de travailler
+//   * => waiting (en train de disable ou enable)
+//   * => refreshing (en train de refresh)
+// * => error action
+//   * => error disable
+//   * => error enable
+//   * => error refresh
+// * simus
+//   * skeleton => data
+//   * skeleton => error
+//   * data => waiting => data
+//   * data => waiting => error
+
+// I/O du composants vv
+// * error: false|"refreshing"|"loading"|"disabling"|"enabling"
+// * status: null|"enabled"|"disabled"
+// * waiting: null|"refreshing"|"disabling"|"enabling"
+//   => disable les boutons
+
+// Exemples
+// => addon-admin
+// => env-var-form
+// => cc-example-component.stories.js
+
 export const defaultStory = makeStory(conf, {
   items: [{
     links: [grafanaLink],
   }],
+});
+
+export const error = makeStory(conf, {
+  items: [{ links: [grafanaLink], error: true }],
 });
 
 export const disabled = makeStory(conf, {
@@ -38,6 +74,14 @@ export const enabled = makeStory(conf, {
   }],
 });
 
+export const waiting = makeStory(conf, {
+  items: [{
+    links: [grafanaLink],
+    enabled: true,
+    waiting: true,
+  }],
+});
+
 export const simulations = makeStory(conf, {
   items: [
     { links: [{ type: 'grafana' }], enabled: true },
@@ -47,6 +91,21 @@ export const simulations = makeStory(conf, {
     storyWait(2000, ([component, componentError]) => {
       component.links = [grafanaLink];
       componentError.error = true;
+    }),
+  ],
+});
+
+export const simulationsWithWaiting = makeStory(conf, {
+  items: [
+    { links: [grafanaLink], enabled: true },
+  ],
+  simulations: [
+    storyWait(2000, ([component]) => {
+      component.waiting = true;
+    }),
+    storyWait(2000, ([component]) => {
+      component.waiting = false;
+      component.enabled = false;
     }),
   ],
 });

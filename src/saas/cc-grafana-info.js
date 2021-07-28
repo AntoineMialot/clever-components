@@ -1,7 +1,7 @@
-import '../atoms/cc-img.js';
-import '../atoms/cc-flex-gap.js';
-import '../molecules/cc-error.js';
+import '../atoms/cc-loader.js';
+import '../molecules/cc-block-section.js';
 import '../molecules/cc-block.js';
+import '../molecules/cc-error.js';
 import { css, html, LitElement } from 'lit-element';
 import { classMap } from 'lit-html/directives/class-map.js';
 import { dispatchCustomEvent } from '../lib/events.js';
@@ -34,6 +34,8 @@ const GRAFANA_ADDON_SCREEN = new URL('../assets/addon.png', import.meta.url).hre
  * }
  * ```
  *
+ * TODO: don't document types that aren't exposed by the component
+ *
  * ```js
  * interface Dashboards {
  *   description: string,
@@ -44,14 +46,16 @@ const GRAFANA_ADDON_SCREEN = new URL('../assets/addon.png', import.meta.url).hre
  *
  * @cssdisplay grid
  *
- * @prop {Boolean} dashboardError - Display an error message due when cann't load dashboards screens.
- * @prop {Boolean} error - Display an error message.
+ * @prop {Boolean} enabled - TODO When Grafana is enabled.
+ * @prop {Boolean} error - Displays an error message.
  * @prop {Link[]} links - Sets the different links.
- * @prop {Boolean} enabled - When Grafana is enabled.
+ * @prop {"refreshing"|"disabling"|"enabling"} waiting - TODO.
+ *
+ * TODO: remove -grafana suffix
  *
  * @event {CustomEvent} cc-grafana-info:enable-grafana - Fires when the enable button is clicked.
- * @event {CustomEvent} cc-grafana-info:refresh-grafana - Fires when the refresh button is clicked.
  * @event {CustomEvent} cc-grafana-info:disable-grafana - Fires when the disable button is clicked.
+ * @event {CustomEvent} cc-grafana-info:refresh-grafana - Fires when the refresh button is clicked.
  */
 export class CcGrafanaInfo extends LitElement {
 
@@ -59,20 +63,21 @@ export class CcGrafanaInfo extends LitElement {
     // TODO sort alpha the property names (same for JSDoc)
     return {
       // TODO: you don't need attribute when it's the same name
-      error: { type: Boolean, attribute: 'error' },
+      error: { type: Boolean },
       // TODO: you need attribute with kebab case when it's more than one word
       // TODO: => dashboard-error
-      dashboardError: { type: Boolean, attribute: 'dashboard-error' },
       enabled: { type: Boolean, attribute: 'enabled' },
       links: { type: Array, attribute: 'links' },
+      refreshing: { type: Boolean },
+      waiting: { type: Boolean },
     };
   }
 
   constructor () {
     super();
-    this.error = false;
-    this.dashboardError = false;
     this.enabled = false;
+    this.error = false;
+    this.waiting = false;
   }
 
   _onEnableSubmit () {
@@ -88,14 +93,26 @@ export class CcGrafanaInfo extends LitElement {
   }
 
   render () {
-    // TODO: you can use the ?? operator instead of || now
+
     const links = this.links ?? [];
     const grafanaLink = links.find(({ type }) => type === 'grafana');
     const isFormDisabled = (this.error !== false) ?? this.saving;
     const dashboards = [
-      { title: 'cc-grafana-info.organization-title', url: GRAFANA_ORG_SCREEN, description: 'cc-grafana-info.organization-description' },
-      { title: 'cc-grafana-info.runtime-title', url: GRAFANA_APPLICATION_SCREEN, description: 'cc-grafana-info.runtime-description' },
-      { title: 'cc-grafana-info.addon-title', url: GRAFANA_ADDON_SCREEN, description: 'cc-grafana-info.addon-description' },
+      {
+        title: i18n('cc-grafana-info.organization-title'),
+        url: GRAFANA_ORG_SCREEN,
+        description: i18n('cc-grafana-info.organization-description'),
+      },
+      {
+        title: i18n('cc-grafana-info.runtime-title'),
+        url: GRAFANA_APPLICATION_SCREEN,
+        description: i18n('cc-grafana-info.runtime-description'),
+      },
+      {
+        title: i18n('cc-grafana-info.addon-title'),
+        url: GRAFANA_ADDON_SCREEN,
+        description: i18n('cc-grafana-info.addon-description'),
+      },
     ];
 
     return html`
@@ -103,29 +120,41 @@ export class CcGrafanaInfo extends LitElement {
       <cc-block>
 
         <div slot="title" style="font-weight: bold;">${i18n('cc-grafana-info.main-title')}</div>
-        
-        ${!this.error ? html`  
-          <cc-block-section>
-            <div slot="title">${i18n('cc-grafana-info.documentation-title')}</div>
-            <div slot="info">${i18n('cc-grafana-info.documentation-description')}</div>
-            <div>
-              ${ccLink(GRAFANA_DOCUMENTATION, html`
-                <cc-img src="${infoSvg}"></cc-img><span>${i18n('cc-grafana-info.link.doc')}</span>
-              `)}
-            </div>
-          </cc-block-section>
-          
+
+        ${this.waiting ? html`
+          <cc-loader slot="overlay"></cc-loader>
+        ` : ''}
+
+        <cc-block-section>
+          <div slot="title">${i18n('cc-grafana-info.documentation-title')}</div>
+          <div slot="info">${i18n('cc-grafana-info.documentation-description')}</div>
+          <div>
+            ${ccLink(GRAFANA_DOCUMENTATION, html`
+              <cc-img src="${infoSvg}"></cc-img><span>${i18n('cc-grafana-info.link.doc')}</span>
+            `)}
+          </div>
+        </cc-block-section>
+
+        <div style="display: flex; border-top:1px solid #000;padding-top: 1em;">
+          <cc-loader></cc-loader> <span>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque feugiat dui at leo porta dignissim.</span>
+        </div>
+
+        ${this.error ? html`
+          <cc-error>${i18n('cc-grafana-info.error')}</cc-error>
+        ` : ''}
+
+        ${!this.error ? html`
+
           ${!this.enabled ? html`
-          <cc-block-section>
+            <cc-block-section>
               <div slot="title">${i18n('cc-grafana-info.enable-title')}</div>
               <div slot="info">${i18n('cc-grafana-info.enable-description')}</div>
               <div>
-                <cc-button primary ?skeleton=${this._skeleton} ?disabled=${isFormDisabled} @cc-button:click=${this._onEnableSubmit}>${i18n('cc-grafana-info.enable')}</cc-button>
+                <cc-button success ?skeleton=${this._skeleton} ?disabled=${isFormDisabled} @cc-button:click=${this._onEnableSubmit}>${i18n('cc-grafana-info.enable')}</cc-button>
               </div>
             </cc-block-section>
           ` : ''}
-          
-  
+
           ${this.enabled ? html`
             <cc-block-section>
               <div slot="title">${i18n('cc-grafana-info.grafana-link-title')}</div>
@@ -133,57 +162,43 @@ export class CcGrafanaInfo extends LitElement {
               <div>
                 ${grafanaLink != null ? html`
                   ${ccLink(grafanaLink.href, html`
-                    <cc-img src="${GRAFANA_LOGO_URL}"></cc-img><span class="${classMap({ skeleton: (grafanaLink.href == null) })}">${i18n('cc-grafana-info.link.grafana')}</span>
+                    <cc-img src="${GRAFANA_LOGO_URL}"></cc-img>
+                    <span class="${classMap({ skeleton: (grafanaLink.href == null) })}">${i18n('cc-grafana-info.link.grafana')}</span>
                   `)}
                 ` : ''}
               </div>
             </cc-block-section>
-  
+
             <cc-block-section>
               <div slot="title">${i18n('cc-grafana-info.refresh-title')}</div>
               <div slot="info">${i18n('cc-grafana-info.refresh-description')}</div>
               <div>
-                <cc-button primary ?skeleton=${this._skeleton} ?disabled=${isFormDisabled} @cc-button:click=${this._onRefreshSubmit}>${i18n('cc-grafana-info.refresh')}</cc-button>
+                <cc-button primary ?skeleton=${this._skeleton} ?disabled=${isFormDisabled} ?waiting=${this.refreshing} @cc-button:click=${this._onRefreshSubmit}>${i18n('cc-grafana-info.refresh')}</cc-button>
               </div>
             </cc-block-section>
-  
+
             <cc-block-section>
               <div slot="title">${i18n('cc-grafana-info.disable-title')}</div>
               <div slot="info">${i18n('cc-grafana-info.disable-description')}</div>
               <div>
-                <cc-button primary ?skeleton=${this._skeleton} ?disabled=${isFormDisabled} @cc-button:click=${this._onDisableSubmit}>${i18n('cc-grafana-info.disable')}</cc-button>
+                <cc-button danger delay="3" ?skeleton=${this._skeleton} ?disabled=${isFormDisabled} @cc-button:click=${this._onDisableSubmit}>${i18n('cc-grafana-info.disable')}</cc-button>
               </div>
             </cc-block-section>
           ` : ''}
         ` : ''}
 
-        ${!this.dashboardError ? html`
-          
-            ${dashboards.map((item) => html`
+        ${!this.waiting ? html`
+          ${dashboards.map((item) => html`
             <cc-block-section>
-
+              <div slot="title">${item.title}</div>
+              <div slot="info">${item.description}</div>
               <div>
                 ${ccLink(item.url, html`
-                    <cc-img .src="${item.url}" style="height: 20rem; width: 40rem;"></cc-img>
-                  `)}
+                  <img class="dashboard-screenshot" src="${item.url}" alt="TODO">
+                `)}
               </div>
-              <div  slot="title">
-                <span>${i18n(item.title)}</span>
-              </div>
-              <div  slot="info">
-                <span>${i18n(item.description)}</span>
-              </div>
-
             </cc-block-section>
-            `)}
-        ` : ''}
-  
-        ${this.error ? html`
-          <cc-error>${i18n('cc-grafana-info.error')}</cc-error>
-        ` : ''}
-  
-        ${this.dashboardError ? html`
-          <cc-error>${i18n('cc-grafana-info.error')}</cc-error>
+          `)}
         ` : ''}
 
       </cc-block>
@@ -197,54 +212,26 @@ export class CcGrafanaInfo extends LitElement {
       // language=CSS
       css`
         :host {
-          --cc-gap: 1rem;
-          /*background-color: #fff;*/
-          /*border: 1px solid #bcc2d1;*/
-          /*border-radius: 0.25rem;*/
-          /*display: grid;*/
-          /*grid-gap: var(--cc-gap);*/
-          /*overflow: hidden;*/
-          /*padding: var(--cc-gap);*/
-          /*padding-left: 4rem;*/
-          /*position: relative;*/
+          --cc-gap: 1em;
+        }
+
+        cc-img {
+          border-radius: 0.25em;
+          flex: 0 0 auto;
+          height: 1.5em;
+          margin-right: 0.5em;
+          width: 1.5em;
         }
 
         .cc-link {
           align-items: center;
-          display: flex;
+          display: inline-flex;
         }
 
-        cc-img {
-          border-radius: 0.25rem;
-          flex: 0 0 auto;
-          height: 1.5rem;
-          margin-right: 0.5rem;
-          width: 1.5rem;
-        }
-
-        .info-ribbon {
-          --height: 1.5rem;
-          --width: 8rem;
-          --r: -45deg;
-          --translate: 1.6rem;
-          background: #3A3871;
-          color: white;
-          font-size: 0.9rem;
-          font-weight: bold;
-          height: var(--height);
-          left: calc(var(--width) / -2);
-          line-height: var(--height);
-          position: absolute;
-          text-align: center;
-          top: calc(var(--height) / -2);
-          transform: rotate(var(--r)) translateY(var(--translate));
-          width: var(--width);
-          z-index: 2;
-        }
-
-        /* SKELETON */
-        .skeleton {
-          background-color: #bbb;
+        .dashboard-screenshot {
+          border-radius: 0.25em;
+          max-width: 50em;
+          width: 100%;
         }
 
         cc-error {
