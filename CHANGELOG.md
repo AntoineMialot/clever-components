@@ -18,6 +18,7 @@ title: Changelog
 * New component:
   * `<cc-env-var-editor-json>`
 * `<cc-env-var-form>`: add JSON mode
+* `<cc-env-var-editor-expert>`: keeping only valid values when leaving expert mode
 
 ## 6.10.0 (2021-07-08)
 
