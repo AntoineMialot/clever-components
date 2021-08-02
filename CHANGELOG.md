@@ -15,6 +15,8 @@ title: Changelog
 * `<cc-toggle>`: replace rem with em
 * `<cc-pricing-product-cellar>`: delete component and replace it with a more generic component (BREAKING CHANGE)
 * `<cc-pricing-product-storage>`: introduce a more generic version of `<cc-pricing-product-cellar>` that works with smart definition for Cellar & FS Bucket
+* New component:
+  * `<cc-env-var-editor-json>`
 
 ## 6.10.0 (2021-07-08)
 
