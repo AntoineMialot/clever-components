@@ -17,6 +17,7 @@ title: Changelog
 * `<cc-pricing-product-storage>`: introduce a more generic version of `<cc-pricing-product-cellar>` that works with smart definition for Cellar & FS Bucket
 * New component:
   * `<cc-env-var-editor-json>`
+* `<cc-env-var-form>`: add JSON mode
 
 ## 6.10.0 (2021-07-08)
 

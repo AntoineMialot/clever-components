@@ -5,6 +5,7 @@ import '../atoms/cc-toggle.js';
 import '../atoms/cc-flex-gap.js';
 import '../molecules/cc-error.js';
 import './cc-env-var-editor-expert.js';
+import './cc-env-var-editor-json.js';
 import './cc-env-var-editor-simple.js';
 import { css, html, LitElement } from 'lit-element';
 import { classMap } from 'lit-html/directives/class-map.js';
@@ -62,6 +63,7 @@ export class CcEnvVarForm extends LitElement {
       _currentVariables: { type: Array, attribute: false },
       _description: { type: String, attribute: false },
       _expertVariables: { type: Array, attribute: false },
+      _jsonVariables: { type: Array, attribute: false },
       _mode: { type: String, attribute: false },
       _isPristine: { type: Boolean, attribute: false },
     };
@@ -82,6 +84,7 @@ export class CcEnvVarForm extends LitElement {
     return [
       { label: i18n('cc-env-var-form.mode.simple'), value: 'SIMPLE' },
       { label: i18n('cc-env-var-form.mode.expert'), value: 'EXPERT' },
+      { label: 'JSON', value: 'JSON' },
     ];
   }
 
@@ -135,6 +138,9 @@ export class CcEnvVarForm extends LitElement {
     if (mode === 'EXPERT') {
       this._expertVariables = this._currentVariables;
     }
+    else if (mode === 'JSON') {
+      this._jsonVariables = this._currentVariables;
+    }
     this._mode = mode;
   }
 
@@ -182,10 +188,12 @@ export class CcEnvVarForm extends LitElement {
       if (this.variables == null) {
         this._currentVariables = null;
         this._expertVariables = null;
+        this._jsonVariables = null;
       }
       else {
         this._currentVariables = this.variables.sort((a, b) => a.name.localeCompare(b.name));
         this._expertVariables = this.variables.sort((a, b) => a.name.localeCompare(b.name));
+        this._jsonVariables = this.variables.sort((a, b) => a.name.localeCompare(b.name));
       }
     }
     super.update(changedProperties);
@@ -199,11 +207,11 @@ export class CcEnvVarForm extends LitElement {
 
     return html`
       <div class="header">
-        
+
         ${this.heading != null ? html`
           <div class="heading">${this.heading}</div>
         ` : ''}
-        
+
         <cc-toggle
           class="mode-switcher ${classMap({ hasOverlay })}"
           value=${this._mode}
@@ -212,9 +220,9 @@ export class CcEnvVarForm extends LitElement {
           @cc-toggle:input=${this._onToggleMode}
         ></cc-toggle>
       </div>
-      
+
       <slot class="description">${this._description}</slot>
-      
+
       <div class="overlay-container">
         <cc-expand class=${classMap({ hasOverlay })}>
           <cc-env-var-editor-simple
@@ -225,7 +233,7 @@ export class CcEnvVarForm extends LitElement {
             @cc-env-var-editor-simple:change=${this._onChange}
             @cc-input-text:requestimplicitsubmit=${(e) => this._onRequestSubmit(e, isFormDisabled)}
           ></cc-env-var-editor-simple>
-          
+
           <cc-env-var-editor-expert
             ?hidden=${this._mode !== 'EXPERT'}
             .variables=${this._expertVariables}
@@ -234,36 +242,45 @@ export class CcEnvVarForm extends LitElement {
             @cc-env-var-editor-expert:change=${this._onChange}
             @cc-input-text:requestimplicitsubmit=${(e) => this._onRequestSubmit(e, isFormDisabled)}
           ></cc-env-var-editor-expert>
+
+          <cc-env-var-editor-json
+            ?hidden=${this._mode !== 'JSON'}
+            .variables=${this._jsonVariables}
+            ?disabled=${isEditorDisabled}
+            ?readonly=${this.readonly}
+            @cc-env-var-editor-json:change=${this._onChange}
+            @cc-input-text:requestimplicitsubmit=${(e) => this._onRequestSubmit(e, isFormDisabled)}
+          ></cc-env-var-editor-json>
         </cc-expand>
-        
+
         ${this.error === 'loading' ? html`
           <div class="error-container">
             <cc-error mode="info">${this._getErrorMessage()}</cc-error>
           </div>
         ` : ''}
-        
+
         ${this.error === 'saving' ? html`
           <div class="error-container">
             <cc-error mode="confirm" @cc-error:ok=${() => dispatchCustomEvent(this, 'dismissed-error')}>${this._getErrorMessage()}</cc-error>
           </div>
         ` : ''}
-        
+
         ${this.saving ? html`
-      <cc-loader class="saving-loader"></cc-loader>
-    ` : ''}
+          <cc-loader class="saving-loader"></cc-loader>
+        ` : ''}
       </div>
-        
+
       ${!this.readonly ? html`
         <cc-flex-gap class="button-bar">
-          
+
           <cc-button ?disabled=${isFormDisabled} @cc-button:click=${this._onResetForm}>${i18n('cc-env-var-form.reset')}</cc-button>
-          
+
           <div class="spacer"></div>
-          
+
           ${this.restartApp ? html`
             <cc-button @cc-button:click=${() => dispatchCustomEvent(this, 'restart-app')}>${i18n('cc-env-var-form.restart-app')}</cc-button>
           ` : ''}
-          
+
           <cc-button success ?disabled=${isFormDisabled} @cc-button:click=${this._onUpdateForm}>${i18n('cc-env-var-form.update')}</cc-button>
         </cc-flex-gap>
       ` : ''}
@@ -275,79 +292,79 @@ export class CcEnvVarForm extends LitElement {
       // language=CSS
       linkStyles,
       css`
-        :host {
-          background: #fff;
-          border: 1px solid #bcc2d1;
-          border-radius: 0.25rem;
-          display: block;
-          padding: 1rem;
-        }
+          :host {
+              background: #fff;
+              border: 1px solid #bcc2d1;
+              border-radius: 0.25rem;
+              display: block;
+              padding: 1rem;
+          }
 
-        .header {
-          align-items: flex-start;
-          display: flex;
-          justify-content: center;
-          margin-bottom: 0.5rem;
-        }
+          .header {
+              align-items: flex-start;
+              display: flex;
+              justify-content: center;
+              margin-bottom: 0.5rem;
+          }
 
-        .heading {
-          color: #3A3871;
-          flex: 1 1 0;
-          font-size: 1.2rem;
-          font-weight: bold;
-        }
+          .heading {
+              color: #3A3871;
+              flex: 1 1 0;
+              font-size: 1.2rem;
+              font-weight: bold;
+          }
 
-        .description {
-          color: #555;
-          display: block;
-          font-style: italic;
-          line-height: 1.5;
-          margin-bottom: 1rem;
-        }
+          .description {
+              color: #555;
+              display: block;
+              font-style: italic;
+              line-height: 1.5;
+              margin-bottom: 1rem;
+          }
 
-        .hasOverlay {
-          --cc-skeleton-state: paused;
-          filter: blur(0.3rem);
-        }
+          .hasOverlay {
+              --cc-skeleton-state: paused;
+              filter: blur(0.3rem);
+          }
 
-        .overlay-container {
-          position: relative;
-        }
-        
-        cc-expand {
-          /* We need to spread so the focus rings can be visible even with cc-expand default overflow:hidden */
-          margin: -0.25rem;
-          padding: 0.25rem;
-        }
+          .overlay-container {
+              position: relative;
+          }
 
-        .error-container {
-          align-items: center;
-          display: flex;
-          flex-direction: column;
-          height: 100%;
-          justify-content: center;
-          left: 0;
-          position: absolute;
-          top: 0;
-          width: 100%;
-        }
+          cc-expand {
+              /* We need to spread so the focus rings can be visible even with cc-expand default overflow:hidden */
+              margin: -0.25rem;
+              padding: 0.25rem;
+          }
 
-        .saving-loader {
-          height: 100%;
-          left: 0;
-          position: absolute;
-          top: 0;
-          width: 100%;
-        }
+          .error-container {
+              align-items: center;
+              display: flex;
+              flex-direction: column;
+              height: 100%;
+              justify-content: center;
+              left: 0;
+              position: absolute;
+              top: 0;
+              width: 100%;
+          }
 
-        .button-bar {
-          --cc-gap: 1rem;
-          margin-top: 1.5rem;
-        }
+          .saving-loader {
+              height: 100%;
+              left: 0;
+              position: absolute;
+              top: 0;
+              width: 100%;
+          }
 
-        .spacer {
-          flex: 1 1 0;
-        }
+          .button-bar {
+              --cc-gap: 1rem;
+              margin-top: 1.5rem;
+          }
+
+          .spacer {
+              flex: 1 1 0;
+          }
       `,
     ];
   }
