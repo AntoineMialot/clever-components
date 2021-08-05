@@ -29,6 +29,7 @@ const SKELETON_VARIABLES = [
  *
  * @prop {Boolean} disabled - Sets `disabled` attribute on inputs and buttons.
  * @prop {Boolean} readonly - Sets `readonly` attribute on main input and hides buttons.
+ * @prop {Boolean} strictMode - Sets the variables name validation to strict. (false by default)
  * @prop {Variable[]} variables - Sets the list of variables.
  *
  * @event {CustomEvent<Variable[]>} cc-env-var-editor-expert:change - Fires the new list of variables whenever something changes in the list.
@@ -39,6 +40,7 @@ export class CcEnvVarEditorExpert extends LitElement {
     return {
       disabled: { type: Boolean },
       readonly: { type: Boolean },
+      strictMode: { type: Boolean, attribute: 'strict-mode' },
       variables: { type: Array },
       _variablesAsText: { type: Array, attribute: false },
       _errors: { type: Array, attribute: false },
@@ -48,6 +50,7 @@ export class CcEnvVarEditorExpert extends LitElement {
 
   constructor () {
     super();
+    this.strictMode = false;
     // lit-analyzer needs this
     this._skeleton = false;
     // Triggers setter (init _skeleton, _variablesAsText and _errors)
@@ -82,12 +85,18 @@ export class CcEnvVarEditorExpert extends LitElement {
           msg: i18n('cc-env-var-editor-expert.errors.invalid-value'),
         };
       }
+      if (type === ERROR_TYPES.INVALID_NAME_STRICT) {
+        return {
+          line: pos.line,
+          msg: i18n('cc-env-var-editor-expert.errors.invalid-name-strict', { name }),
+        };
+      }
       return { line: '?', msg: i18n('cc-env-var-editor-expert.errors.unknown') };
     });
   }
 
   _onInput ({ detail: value }) {
-    const { variables, errors } = parseRaw(value);
+    const { variables, errors } = parseRaw(value, this.strictMode);
     this._setErrors(errors);
     dispatchCustomEvent(this, 'change', variables);
   }

@@ -38,6 +38,7 @@ import { linkStyles } from '../templates/cc-link.js';
  * @prop {"saving"|"loading"} error - Displays an error message (saving or loading).
  * @prop {String} heading - Sets a text to be used as a header title.
  * @prop {Boolean} readonly - Sets `readonly` attribute input and hides buttons.
+ * @prop {Boolean} strictMode - Sets the variables name validation to strict. (false by default)
  * @prop {Boolean} restartApp - Displays the restart app button.
  * @prop {Boolean} saving - Enables saving sate (form is disabled and loader is displayed).
  * @prop {Variable[]} variables - Sets the list of variables.
@@ -59,6 +60,7 @@ export class CcEnvVarForm extends LitElement {
       readonly: { type: Boolean, reflect: true },
       restartApp: { type: Boolean, attribute: 'restart-app' },
       saving: { type: Boolean, reflect: true },
+      strictMode: { type: Boolean, attribute: 'strict-mode' },
       variables: { type: Array },
       _currentVariables: { type: Array, attribute: false },
       _description: { type: String, attribute: false },
@@ -75,6 +77,7 @@ export class CcEnvVarForm extends LitElement {
     this.readonly = false;
     this.restartApp = false;
     this.saving = false;
+    this.strictMode = false;
     // this.variables is let to undefined by default (this triggers skeleton screen)
     this._mode = 'SIMPLE';
     this._description = '';
@@ -230,6 +233,7 @@ export class CcEnvVarForm extends LitElement {
             .variables=${this._currentVariables}
             ?disabled=${isEditorDisabled}
             ?readonly=${this.readonly}
+            ?strict-mode=${this.strictMode}
             @cc-env-var-editor-simple:change=${this._onChange}
             @cc-input-text:requestimplicitsubmit=${(e) => this._onRequestSubmit(e, isFormDisabled)}
           ></cc-env-var-editor-simple>
@@ -239,6 +243,7 @@ export class CcEnvVarForm extends LitElement {
             .variables=${this._expertVariables}
             ?disabled=${isEditorDisabled}
             ?readonly=${this.readonly}
+            ?strict-mode=${this.strictMode}
             @cc-env-var-editor-expert:change=${this._onChange}
             @cc-input-text:requestimplicitsubmit=${(e) => this._onRequestSubmit(e, isFormDisabled)}
           ></cc-env-var-editor-expert>
@@ -248,6 +253,7 @@ export class CcEnvVarForm extends LitElement {
             .variables=${this._jsonVariables}
             ?disabled=${isEditorDisabled}
             ?readonly=${this.readonly}
+            ?strict-mode=${this.strictMode}
             @cc-env-var-editor-json:change=${this._onChange}
             @cc-input-text:requestimplicitsubmit=${(e) => this._onRequestSubmit(e, isFormDisabled)}
           ></cc-env-var-editor-json>

@@ -28,6 +28,7 @@ const SKELETON_VARIABLES = [
  *
  * @prop {Boolean} disabled - Sets `disabled` attribute on inputs and buttons.
  * @prop {Boolean} readonly - Sets `readonly` attribute on main input and hides buttons.
+ * @prop {Boolean} strictMode - Sets the variables name validation to strict. (false by default)
  * @prop {Variable[]} variables - Sets the list of variables.
  *
  * @event {CustomEvent<Variable[]>} cc-env-var-editor-json:change - Fires the new list of variables whenever something changes in the list.
@@ -39,6 +40,7 @@ export class CcEnvVarEditorJson extends LitElement {
     return {
       disabled: { type: Boolean },
       readonly: { type: Boolean },
+      strictMode: { type: Boolean, attribute: 'strict-mode'},
       variables: { type: Array },
       _errors: { type: Array },
       _formattedErrors: { type: Array, attribute: false },
@@ -51,6 +53,7 @@ export class CcEnvVarEditorJson extends LitElement {
     super();
     this.disabled = false;
     this.readonly = false;
+    this.strictMode = false;
     this.variables = null;
     this._errors = [];
     this._skeleton = false;
@@ -83,12 +86,17 @@ export class CcEnvVarEditorJson extends LitElement {
           msg: i18n('cc-env-var-editor-json.errors.invalid-json-entry'),
         };
       }
+      if (type === ERROR_TYPES.INVALID_NAME_STRICT) {
+        return {
+          msg: i18n('cc-env-var-editor-json.errors.invalid-name-strict', { name }),
+        };
+      }
       return { line: '?', msg: i18n('cc-env-var-editor-json.errors.unknown') };
     });
   }
 
   _onInput ({ detail: value }) {
-    const { variables, errors } = parseRawJson(value);
+    const { variables, errors } = parseRawJson(value, this.strictMode);
     this._setErrors(errors);
     dispatchCustomEvent(this, 'change', variables);
   }

@@ -204,6 +204,7 @@ export const translations = {
   'cc-env-var-create.create-button': `Ajouter`,
   'cc-env-var-create.errors.already-defined-name': ({ name }) => sanitize`Le nom <code>${name}</code> est déjà défini`,
   'cc-env-var-create.errors.invalid-name': ({ name }) => sanitize`Le nom <code>${name}</code> n'est pas valide`,
+  'cc-env-var-create.errors.invalid-name-strict': ({ name }) => sanitize`Le nom <code>${name}</code> n'est pas valide en mode strict`,
   'cc-env-var-create.name.placeholder': `NOM_DE_LA_VARIABLE`,
   'cc-env-var-create.value.placeholder': `valeur de la variable`,
   //#endregion
@@ -212,6 +213,7 @@ export const translations = {
   'cc-env-var-editor-expert.errors.invalid-line': () => sanitize`cette ligne est invalide, le format correct est : <code>NOM="VALEUR"</code>`,
   'cc-env-var-editor-expert.errors.invalid-name': ({ name }) => sanitize`Le nom <code>${name}</code> n'est pas valide`,
   'cc-env-var-editor-expert.errors.invalid-value': () => sanitize`la valeur est invalide, si vous utilisez des guillements, vous devez les échapper comme ceci : <code>\\"</code> ou alors mettre toute la valeur entre guillemets.`,
+  'cc-env-var-editor-expert.errors.invalid-name-strict': ({ name }) => sanitize`Le nom <code>${name}</code> n'est pas valide en mode strict`,
   'cc-env-var-editor-expert.errors.line': `ligne`,
   'cc-env-var-editor-expert.errors.unknown': `Erreur inconnue`,
   'cc-env-var-editor-expert.placeholder': `NOM_DE_LA_VARIABLE="valeur de la variable"`,
@@ -223,6 +225,7 @@ export const translations = {
   'cc-env-var-editor-json.errors.invalid-json-entry': `Le JSON entré est un tableau d'objets JSON valide mais toutes les valeurs des propriétés doivent être de type string. Ex : '[{ "name": "THE_NAME", "value": "the value" }]'`,
   'cc-env-var-editor-json.errors.invalid-json-format': `Le JSON entré est valide mais n'est pas au bon format. Le JSON doit être un tableau d'objets`,
   'cc-env-var-editor-json.errors.invalid-name': ({ name }) => sanitize`Le nom <code>${name}</code> n'est pas valide`,
+  'cc-env-var-editor-json.errors.invalid-name-strict': ({ name }) => sanitize`Le nom <code>${name}</code> n'est pas valide en mode strict`,
   'cc-env-var-editor-json.errors.unknown': `Erreur inconnue`,
   'cc-env-var-editor-json.placeholder': `'[{ "name": "THE_NAME", "value": "the value" }]'`,
   'cc-env-var-editor-json.placeholder-readonly': `Il n'y a pas de variables.`,

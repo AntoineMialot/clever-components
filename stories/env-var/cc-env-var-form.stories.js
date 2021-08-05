@@ -92,6 +92,10 @@ export const errorWithSaving = makeStory(conf, {
   items: [{ appName: 'Foobar backend python', context: 'env-var', variables: VARIABLES_FULL, error: 'saving' }],
 });
 
+export const strictMode = makeStory(conf, {
+  items: [{ appName: 'Foobar backend python (strict mode)', context: 'env-var', variables: VARIABLES_FULL, strictMode: true }],
+});
+
 enhanceStoriesNames({
   defaultStory,
   skeleton,
@@ -110,4 +114,5 @@ enhanceStoriesNames({
   errorWithLoading,
   errorWithLoadingAndReadonly,
   errorWithSaving,
+  strictMode,
 });
