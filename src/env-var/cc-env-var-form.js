@@ -24,6 +24,12 @@ import { linkStyles } from '../templates/cc-link.js';
  * ## Type definitions
  *
  * ```js
+ * interface ParserOptions {
+ *   mode: string,
+ * }
+ * ```
+ *
+ * ```js
  * interface Variable {
  *   name: string,
  *   value: string,
@@ -37,6 +43,7 @@ import { linkStyles } from '../templates/cc-link.js';
  * @prop {"env-var"|"env-var-simple"|"env-var-addon"|"exposed-config"} context - Defines where the form will be used so it can display the appropriate heading and description.
  * @prop {"saving"|"loading"} error - Displays an error message (saving or loading).
  * @prop {String} heading - Sets a text to be used as a header title.
+ * @prop {parserOptions} parserOptions - Sets the options for the variables parser.
  * @prop {Boolean} readonly - Sets `readonly` attribute input and hides buttons.
  * @prop {Boolean} strictMode - Sets the variables name validation to strict. (false by default)
  * @prop {Boolean} restartApp - Displays the restart app button.
@@ -57,6 +64,7 @@ export class CcEnvVarForm extends LitElement {
       context: { type: String },
       error: { type: String, reflect: true },
       heading: { type: String, reflect: true },
+      parserOptions: { type: Object, attribute: 'parser-options' },
       readonly: { type: Boolean, reflect: true },
       restartApp: { type: Boolean, attribute: 'restart-app' },
       saving: { type: Boolean, reflect: true },
@@ -74,10 +82,10 @@ export class CcEnvVarForm extends LitElement {
   constructor () {
     super();
     this.appName = '?';
+    this.parserOptions = { mode: null };
     this.readonly = false;
     this.restartApp = false;
     this.saving = false;
-    this.strictMode = false;
     // this.variables is let to undefined by default (this triggers skeleton screen)
     this._mode = 'SIMPLE';
     this._description = '';
@@ -229,31 +237,31 @@ export class CcEnvVarForm extends LitElement {
       <div class="overlay-container">
         <cc-expand class=${classMap({ hasOverlay })}>
           <cc-env-var-editor-simple
+            mode=${this.parserOptions.mode ?? ''}
             ?hidden=${this._mode !== 'SIMPLE'}
             .variables=${this._currentVariables}
             ?disabled=${isEditorDisabled}
             ?readonly=${this.readonly}
-            ?strict-mode=${this.strictMode}
             @cc-env-var-editor-simple:change=${this._onChange}
             @cc-input-text:requestimplicitsubmit=${(e) => this._onRequestSubmit(e, isFormDisabled)}
           ></cc-env-var-editor-simple>
 
           <cc-env-var-editor-expert
             ?hidden=${this._mode !== 'EXPERT'}
+            .parserOptions=${this.parserOptions}
             .variables=${this._expertVariables}
             ?disabled=${isEditorDisabled}
             ?readonly=${this.readonly}
-            ?strict-mode=${this.strictMode}
             @cc-env-var-editor-expert:change=${this._onChange}
             @cc-input-text:requestimplicitsubmit=${(e) => this._onRequestSubmit(e, isFormDisabled)}
           ></cc-env-var-editor-expert>
 
           <cc-env-var-editor-json
             ?hidden=${this._mode !== 'JSON'}
+            .parserOptions=${this.parserOptions}
             .variables=${this._jsonVariables}
             ?disabled=${isEditorDisabled}
             ?readonly=${this.readonly}
-            ?strict-mode=${this.strictMode}
             @cc-env-var-editor-json:change=${this._onChange}
             @cc-input-text:requestimplicitsubmit=${(e) => this._onRequestSubmit(e, isFormDisabled)}
           ></cc-env-var-editor-json>
@@ -298,79 +306,79 @@ export class CcEnvVarForm extends LitElement {
       // language=CSS
       linkStyles,
       css`
-          :host {
-              background: #fff;
-              border: 1px solid #bcc2d1;
-              border-radius: 0.25rem;
-              display: block;
-              padding: 1rem;
-          }
+        :host {
+          background: #fff;
+          border: 1px solid #bcc2d1;
+          border-radius: 0.25rem;
+          display: block;
+          padding: 1rem;
+        }
 
-          .header {
-              align-items: flex-start;
-              display: flex;
-              justify-content: center;
-              margin-bottom: 0.5rem;
-          }
+        .header {
+          align-items: flex-start;
+          display: flex;
+          justify-content: center;
+          margin-bottom: 0.5rem;
+        }
 
-          .heading {
-              color: #3A3871;
-              flex: 1 1 0;
-              font-size: 1.2rem;
-              font-weight: bold;
-          }
+        .heading {
+          color: #3A3871;
+          flex: 1 1 0;
+          font-size: 1.2rem;
+          font-weight: bold;
+        }
 
-          .description {
-              color: #555;
-              display: block;
-              font-style: italic;
-              line-height: 1.5;
-              margin-bottom: 1rem;
-          }
+        .description {
+          color: #555;
+          display: block;
+          font-style: italic;
+          line-height: 1.5;
+          margin-bottom: 1rem;
+        }
 
-          .hasOverlay {
-              --cc-skeleton-state: paused;
-              filter: blur(0.3rem);
-          }
+        .hasOverlay {
+          --cc-skeleton-state: paused;
+          filter: blur(0.3rem);
+        }
 
-          .overlay-container {
-              position: relative;
-          }
+        .overlay-container {
+          position: relative;
+        }
 
-          cc-expand {
-              /* We need to spread so the focus rings can be visible even with cc-expand default overflow:hidden */
-              margin: -0.25rem;
-              padding: 0.25rem;
-          }
+        cc-expand {
+          /* We need to spread so the focus rings can be visible even with cc-expand default overflow:hidden */
+          margin: -0.25rem;
+          padding: 0.25rem;
+        }
 
-          .error-container {
-              align-items: center;
-              display: flex;
-              flex-direction: column;
-              height: 100%;
-              justify-content: center;
-              left: 0;
-              position: absolute;
-              top: 0;
-              width: 100%;
-          }
+        .error-container {
+          align-items: center;
+          display: flex;
+          flex-direction: column;
+          height: 100%;
+          justify-content: center;
+          left: 0;
+          position: absolute;
+          top: 0;
+          width: 100%;
+        }
 
-          .saving-loader {
-              height: 100%;
-              left: 0;
-              position: absolute;
-              top: 0;
-              width: 100%;
-          }
+        .saving-loader {
+          height: 100%;
+          left: 0;
+          position: absolute;
+          top: 0;
+          width: 100%;
+        }
 
-          .button-bar {
-              --cc-gap: 1rem;
-              margin-top: 1.5rem;
-          }
+        .button-bar {
+          --cc-gap: 1rem;
+          margin-top: 1.5rem;
+        }
 
-          .spacer {
-              flex: 1 1 0;
-          }
+        .spacer {
+          flex: 1 1 0;
+        }
       `,
     ];
   }

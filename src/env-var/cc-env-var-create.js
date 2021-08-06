@@ -28,7 +28,7 @@ import { defaultThemeStyles } from '../styles/default-theme.js';
  * @cssdisplay block
  *
  * @prop {Boolean} disabled - Sets `disabled` attribute on inputs and button.
- * @prop {Boolean} strictMode - Sets the variables name validation to strict. (false by default)
+ * @prop {String} mode - Sets the mode of the variables name validation.
  * @prop {String[]} variablesNames - Sets list of existing variables names (so we can display an error if it already exists).
  *
  * @event {CustomEvent<Variable>} cc-env-var-create:create - Fires the variable whenever the add button is clicked.
@@ -38,7 +38,7 @@ export class CcEnvVarCreate extends LitElement {
   static get properties () {
     return {
       disabled: { type: Boolean },
-      strictMode: { type: Boolean, attribute: 'strict-mode' },
+      mode: { type: String },
       variablesNames: { type: Array, attribute: 'variables-names' },
       _variableName: { type: String, attribute: false },
       _variableValue: { type: String, attribute: false },
@@ -48,7 +48,7 @@ export class CcEnvVarCreate extends LitElement {
   constructor () {
     super();
     this.disabled = false;
-    this.strictMode = false;
+    this.mode = '';
     this.variablesNames = [];
     this.reset();
   }
@@ -86,7 +86,7 @@ export class CcEnvVarCreate extends LitElement {
 
   render () {
 
-    const isNameInvalid = !validateName(this._variableName, this.strictMode);
+    const isNameInvalid = !validateName(this._variableName, this.mode);
     const isNameAlreadyDefined = this.variablesNames.includes(this._variableName);
     const hasErrors = isNameInvalid || isNameAlreadyDefined;
 
@@ -125,10 +125,10 @@ export class CcEnvVarCreate extends LitElement {
         </cc-flex-gap>
       </cc-flex-gap>
 
-      ${(isNameInvalid && this.strictMode && this._variableName !== '') ? html`
+      ${(isNameInvalid && this.mode === 'strict' && this._variableName !== '') ? html`
         <cc-error>${i18n(`cc-env-var-create.errors.invalid-name-strict`, { name: this._variableName })}</cc-error>
       ` : ''}
-      ${(isNameInvalid && !this.strictMode && this._variableName !== '') ? html`
+      ${(isNameInvalid && this.mode !== 'strict' && this._variableName !== '') ? html`
         <cc-error>${i18n(`cc-env-var-create.errors.invalid-name`, { name: this._variableName })}</cc-error>
       ` : ''}
       ${isNameAlreadyDefined ? html`

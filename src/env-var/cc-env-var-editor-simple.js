@@ -27,8 +27,8 @@ const SKELETON_VARIABLES = [
  * @cssdisplay grid / none (with `[hidden]`)
  *
  * @prop {Boolean} disabled - Sets `disabled` attribute on inputs and buttons.
+ * @prop {String} mode - Sets the mode of the variables name validation.
  * @prop {Boolean} readonly - Sets `readonly` attribute on inputs and hides buttons.
- * @prop {Boolean} strictMode - Sets the variables name validation to strict. (false by default)
  * @prop {Variable[]} variables - Sets the list of variables.
  *
  * @event {CustomEvent<Variable[]>} cc-env-var-editor-simple:change - Fires the new list of variables whenever something changes in the list.
@@ -38,6 +38,7 @@ export class CcEnvVarEditorSimple extends LitElement {
   static get properties () {
     return {
       disabled: { type: Boolean },
+      mode: { type: String },
       readonly: { type: Boolean },
       strictMode: { type: Boolean, attribute: 'strict-mode' },
       variables: { type: Array },
@@ -48,8 +49,8 @@ export class CcEnvVarEditorSimple extends LitElement {
     super();
     // this.variables is let to undefined by default (this triggers skeleton screen)
     this.disabled = false;
+    this.mode = '';
     this.readonly = false;
-    this.strictMode = false;
   }
 
   _onCreate ({ detail: newVar }) {
@@ -101,7 +102,7 @@ export class CcEnvVarEditorSimple extends LitElement {
       ${!this.readonly ? html`
         <cc-env-var-create
           ?disabled=${skeleton || this.disabled}
-          ?strict-mode=${this.strictMode}
+          mode=${this.mode}
           .variablesNames=${variablesNames}
           @cc-env-var-create:create=${this._onCreate}
         ></cc-env-var-create>
@@ -113,6 +114,7 @@ export class CcEnvVarEditorSimple extends LitElement {
       
       ${repeat(variables, ({ name }) => name, ({ name, value, isNew, isEdited, isDeleted }) => html`
         <cc-env-var-input
+          mode=${this.mode}
           name=${name}
           value=${value}
           ?new=${isNew}

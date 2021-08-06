@@ -17,6 +17,12 @@ const SKELETON_VARIABLES = [
  * ## Type definitions
  *
  * ```js
+ * interface ParserOptions {
+ *   mode: string,
+ * }
+ * ```
+ *
+ * ```js
  * interface Variable {
  *   name: string,
  *   value: string,
@@ -27,8 +33,8 @@ const SKELETON_VARIABLES = [
  * @cssdisplay block
  *
  * @prop {Boolean} disabled - Sets `disabled` attribute on inputs and buttons.
+ * @prop {ParserOptions} parserOptions - Sets the options for the variables parser.
  * @prop {Boolean} readonly - Sets `readonly` attribute on main input and hides buttons.
- * @prop {Boolean} strictMode - Sets the variables name validation to strict. (false by default)
  * @prop {Variable[]} variables - Sets the list of variables.
  *
  * @event {CustomEvent<Variable[]>} cc-env-var-editor-json:change - Fires the new list of variables whenever something changes in the list.
@@ -39,8 +45,8 @@ export class CcEnvVarEditorJson extends LitElement {
   static get properties () {
     return {
       disabled: { type: Boolean },
+      parserOptions: { type: Object },
       readonly: { type: Boolean },
-      strictMode: { type: Boolean, attribute: 'strict-mode'},
       variables: { type: Array },
       _errors: { type: Array },
       _formattedErrors: { type: Array, attribute: false },
@@ -52,8 +58,8 @@ export class CcEnvVarEditorJson extends LitElement {
   constructor () {
     super();
     this.disabled = false;
+    this.parserOptions = { mode: null };
     this.readonly = false;
-    this.strictMode = false;
     this.variables = null;
     this._errors = [];
     this._skeleton = false;
@@ -96,7 +102,7 @@ export class CcEnvVarEditorJson extends LitElement {
   }
 
   _onInput ({ detail: value }) {
-    const { variables, errors } = parseRawJson(value, this.strictMode);
+    const { variables, errors } = parseRawJson(value, this.parserOptions);
     this._setErrors(errors);
     dispatchCustomEvent(this, 'change', variables);
   }

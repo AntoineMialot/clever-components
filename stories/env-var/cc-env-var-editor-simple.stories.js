@@ -59,7 +59,7 @@ export const dataLoadedWithReadonly = makeStory(conf, {
 });
 
 export const strictMode = makeStory(conf, {
-  items: [{ variables: VARIABLES_FULL, strictMode: true }],
+  items: [{ variables: VARIABLES_FULL, mode: 'strict' }],
 });
 
 enhanceStoriesNames({
