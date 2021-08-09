@@ -32,20 +32,6 @@ import { linkStyles } from '../templates/cc-link.js';
  *
  * @cssdisplay inline-block
  *
- * @prop {Boolean} circle - Sets button UI to a circle form when in `hide-text` and `image` mode.
- * @prop {Boolean} danger - Sets button UI _mode_ to danger.
- * @prop {Number} delay - If set, enables delay mechanism and defined the number of seconds before the `cc-button:click` event is actually fired.
- * @prop {Boolean} disabled - Sets `disabled` attribute on inner native `<button>` element.
- * @prop {Boolean} hideText - Hides the text and only displays the image specified with `image`. The slotted text will be added as `title` and `aria-label` on the inner `<button>`.
- * @prop {String} image - If set, enables icon mode and sets the `src` of the inner native `<img>` element.
- * @prop {Boolean} link - If set, the button will look like a link.
- * @prop {Boolean} outlined - Sets button UI as _outlined_ (no background and colored border).
- * @prop {Boolean} primary - Sets button UI _mode_ to primary.
- * @prop {Boolean} skeleton - Enables skeleton screen UI pattern (loading hint).
- * @prop {Boolean} success - Sets button UI _mode_ to success.
- * @prop {Boolean} waiting - If set, shows a waiting/busy indicator and sets `disabled` attribute on inner native `<button>` element.
- * @prop {Boolean} warning - Sets button UI _mode_ to warning.
- *
  * @event {CustomEvent} cc-button:click - Fires whenever the button is clicked.<br>If `delay` is set, fires after the specified `delay` (in seconds).
  *
  * @slot - The content of the button (text or HTML). If you want an image, please look at the `image` attribute.
@@ -73,17 +59,46 @@ export class CcButton extends LitElement {
 
   constructor () {
     super();
+
+    /** @type {Boolean} Sets button UI to a circle form when in `hide-text` and `image` mode */
     this.circle = false;
+
+    /** @type {Boolean} Sets button UI _mode_ to danger */
     this.danger = false;
+
+    /** @type {Number} If set, enables delay mechanism and defined the number of seconds before the `cc-button:click` event is actually fired */
+    this.delay = null;
+
+    /** @type {Boolean} Sets `disabled` attribute on inner native `<button>` element */
     this.disabled = false;
+
+    /** @type {Boolean} If set, the button will look like a link */
     this.link = false;
+
+    /** @type {Boolean} Hides the text and only displays the image specified with `image`. The slotted text will be added as `title` and `aria-label` on the inner `<button>` */
     this.hideText = false;
+
+    /** @type {String} If set, enables icon mode and sets the `src` of the inner native `<img>` element */
+    this.image = null;
+
+    /** @type {Boolean} Sets button UI as _outlined_ (no background and colored border) */
     this.outlined = false;
+
+    /** @type {Boolean} Sets button UI _mode_ to primary */
     this.primary = false;
+
+    /** @type {Boolean} Enables skeleton screen UI pattern (loading hint) */
     this.skeleton = false;
+
+    /** @type {Boolean} Sets button UI _mode_ to success */
     this.success = false;
+
+    /** @type {Boolean} If set, shows a waiting/busy indicator and sets `disabled` attribute on inner native `<button>` element */
     this.waiting = false;
+
+    /** @type {Boolean} Sets button UI _mode_ to warning */
     this.warning = false;
+
     this._cancelMode = false;
   }
 

@@ -12,10 +12,6 @@ import { skeletonStyles } from '../styles/skeleton.js';
  *
  * @cssdisplay inline-block
  *
- * @prop {Boolean} skeleton - Enables skeleton screen UI pattern (loading hint).
- * @prop {String} src - Sets `src` attribute on inner native `<img>` element.
- * @prop {String} text - Sets short fallback text to display when the image cannot be loaded or if `src` is not defined and `skeleton` is `false`.
- *
  * @cssprop {"cover"|"contain"} --cc-img-fit - Sets the `object-fit` of the inner `<img>` element (defaults to "cover").
  */
 export class CcImg extends LitElement {
@@ -32,8 +28,18 @@ export class CcImg extends LitElement {
 
   constructor () {
     super();
+
+    /** @type {Boolean} Enables skeleton screen UI pattern (loading hint) */
     this.skeleton = false;
+
+    /** @type {String} Sets `src` attribute on inner native `<img>` element */
+    this.src = null;
+
+    /** @type {String} Sets short fallback text to display when the image cannot be loaded or if `src` is not defined and `skeleton` is `false` */
+    this.text = null;
+
     this._error = false;
+
     this._loaded = false;
   }
 

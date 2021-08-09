@@ -5,6 +5,10 @@ import { repeat } from 'lit-html/directives/repeat.js';
 import { dispatchCustomEvent } from '../lib/events.js';
 
 /**
+ * @typedef {import('./types.js').Choice} Choice
+ */
+
+/**
  * A radio/checkbox input group component acting like a toggle between many options.
  *
  * ## When to use?
@@ -24,25 +28,7 @@ import { dispatchCustomEvent } from '../lib/events.js';
  * * Multiple mode uses native `input[type=checkbox]` under the hood to keep native behaviour (a11y, keyboards...).
  * * We decided to use a JavaScript array of objects for the choices because it's way simpler to implement and not that dirtier to use.
  *
- * ## Type definitions
- *
- * ```js
- * interface Choice {
- *   label: string,
- *   image?: string,   // Optional URL of an image
- *   value: string,
- * }
- * ```
- *
  * @cssdisplay flex
- *
- * @prop {Choice[]} choices - Sets the list of choices.
- * @prop {Boolean} disabled - Sets the `disabled` attribute on all inner `<input>` of whole group.
- * @prop {Boolean} hideText - Hides the text and only displays the image specified with `choices[i].image`. The text will be added as `title` on the inner `<label>` and an `aria-label` on the inner `<input>`.
- * @prop {String} legend - Sets a legend to describe the whole component (input group).
- * @prop {Array} multipleValues - Enables multiple mode and sets the selected values.
- * @prop {Boolean} subtle - Uses a more subtle display mode, less attractive to the user's attention.
- * @prop {String} value - Sets the selected value (single mode only).
  *
  * @event {CustomEvent<String>} cc-toggle:input - Fires the selected `value` whenever the selected `value` changes (single mode only).
  * @event {CustomEvent<String[]>} cc-toggle:input-multiple - Fires the selected `multipleValues` whenever the selected `multipleValues` changes (single mode only).
@@ -69,9 +55,28 @@ export class CcToggle extends LitElement {
 
   constructor () {
     super();
+
+    /** @type {Choice[]} Sets the list of choices  */
+    this.choices = null;
+
+    /** @type {Boolean} Sets the `disabled` attribute on all inner `<input>` of whole group */
     this.disabled = false;
+
+    /** @type {Boolean} Hides the text and only displays the image specified with `choices[i].image`. The text will be added as `title` on the inner `<label>` and an `aria-label` on the inner `<input>` */
     this.hideText = false;
+
+    /** @type {String} Sets a legend to describe the whole component (input group) */
+    this.legend = null;
+
+    /** @type {Array} Enables multiple mode and sets the selected values */
+    this.multipleValues = null;
+
+    /** @type {Boolean} Uses a more subtle display mode, less attractive to the user's attention */
     this.subtle = false;
+
+    /** @type {String} Sets the selected value (single mode only) */
+    this.value = null;
+
     // use this unique name for isolation (Safari seems to have a bug)
     this._uniqueName = Math.random().toString(36).slice(2);
   }
@@ -135,7 +140,7 @@ export class CcToggle extends LitElement {
                 <span>${label}</span>
               ` : ''}
             </label>
-            `)}
+          `)}
         </div>
       </fieldset>
     `;

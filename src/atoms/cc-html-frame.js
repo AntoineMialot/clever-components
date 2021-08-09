@@ -19,10 +19,6 @@ import './cc-loader.js';
  *
  * @cssdisplay block
  *
- * @prop {Boolean} loading - Enables the loader indicator.
- * @prop {String} sandbox - Sets `sandbox` attribute on inner native `<iframe>` element.
- * @prop {String} title - Sets `title` attribute on the inner `<iframe>` element.
- *
  * @slot - The HTML contents (wrapped in a `<template>`).
  */
 export class CcHtmlFrame extends LitElement {
@@ -37,7 +33,14 @@ export class CcHtmlFrame extends LitElement {
 
   constructor (props) {
     super(props);
+
+    /** @type {Boolean} Enables the loader indicator */
     this.loading = false;
+
+    /** @type {Boolean} Sets `sandbox` attribute on inner native `<iframe>` element */
+    this.sandbox = null;
+
+    /** @type {String} Sets `title` attribute on the inner `<iframe>` element */
     this.title = '';
   }
 

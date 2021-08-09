@@ -6,9 +6,6 @@ import { i18n } from '../lib/i18n.js';
  *
  * @cssdisplay grid
  *
- * @prop {Boolean} fill - Forces the slotted element to fill the beta container size (same heigh and width). By default, the beta container adapts to the slotted element size.
- * @prop {"top-left"|"bottom-left"|"top-right"|"bottom-right"} position - Where to position the beta label.
- *
  * @slot - The content around which the beta label will be positionned. You ONLY one element.
  */
 export class CcBeta extends LitElement {
@@ -22,7 +19,11 @@ export class CcBeta extends LitElement {
 
   constructor () {
     super();
+
+    /** @type {Boolean} Forces the slotted element to fill the beta container size (same heigh and width). By default, the beta container adapts to the slotted element size */
     this.fill = false;
+
+    /** @type {"top-left"|"bottom-left"|"top-right"|"bottom-right"} Where to position the beta label */
     this.position = 'top-left';
   }
 

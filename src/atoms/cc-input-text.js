@@ -48,18 +48,6 @@ function arrayEquals (a, b) {
  *
  * @cssdisplay inline-block / block (with `[multi]`)
  *
- * @prop {Boolean} clipboard - Adds a copy-to-clipboard button (when not disabled and not skeleton).
- * @prop {Boolean} disabled - Sets `disabled` attribute on inner native `<input>/<textarea>` element.
- * @prop {String} label - Sets label for the input.
- * @prop {Boolean} multi - Enables multiline support (with a `<textarea>` instead of an `<input>`).
- * @prop {String} name - Sets `name` attribute on inner native `<input>/<textarea>` element.
- * @prop {String} placeholder - Sets `placeholder` attribute on inner native `<input>/<textarea>` element.
- * @prop {Boolean} readonly - Sets `readonly` attribute on inner native `<input>/<textarea>` element.
- * @prop {Boolean} secret - Enables show/hide secret feature with an eye icon.
- * @prop {Boolean} skeleton - Enables skeleton screen UI pattern (loading hint).
- * @prop {String[]} tags - Sets list of tags and enables tags mode (if not null).
- * @prop {String} value - Sets `value` attribute on inner native input element or textarea's inner content.
- *
  * @event {CustomEvent<String>} cc-input-text:input - Fires the `value` whenever the `value` changes.
  * @event {CustomEvent} cc-input-text:requestimplicitsubmit - Fires when enter key is pressed in simple mode, in tags mode or when ctrl+enter is pressed in multi mode.
  * @event {CustomEvent<String[]>} cc-input-text:tags - Fires an array of tags whenever the `value` changes (separated by spaces).
@@ -87,18 +75,46 @@ export class CcInputText extends LitElement {
 
   constructor () {
     super();
+
+    /** @type {Boolean} Adds a copy-to-clipboard button (when not disabled and not skeleton) */
     this.clipboard = false;
+
+    /** @type {Boolean} Sets `disabled` attribute on inner native `<input>/<textarea>` element */
     this.disabled = false;
+
+    /** @type {String} Sets label for the input */
+    this.label = null;
+
+    /** @type {Boolean} Enables multiline support (with a `<textarea>` instead of an `<input>`) */
     this.multi = false;
+
+    /** @type {String} Sets `name` attribute on inner native `<input>/<textarea>` element */
+    this.name = null;
+
+    /** @type {String} Sets `placeholder` attribute on inner native `<input>/<textarea>` element */
     this.placeholder = '';
+
+    /** @type {Boolean} Sets `readonly` attribute on inner native `<input>/<textarea>` element */
     this.readonly = false;
+
+    /** @type {Boolean} Enables show/hide secret feature with an eye icon */
     this.secret = false;
+
+    /** @type {Boolean} Enables skeleton screen UI pattern (loading hint) */
     this.skeleton = false;
+
+    /** @type {String[]} Sets list of tags and enables tags mode (if not null) */
     this.tags = null;
+
+    /** @type {String} Sets `value` attribute on inner native input element or textarea's inner content */
     this.value = '';
+
     this._copyOk = false;
+
     this._showSecret = false;
+
     this._tagsEnabled = false;
+
     // use this unique name for isolation (Safari seems to have a bug)
     this._uniqueName = Math.random().toString(36).slice(2);
   }
@@ -206,20 +222,22 @@ export class CcInputText extends LitElement {
       ${this.label != null ? html`
         <label for=${this._uniqueName}>${this.label}</label>
       ` : ''}
-      
+
       <div class="meta-input">
         <div class="wrapper ${classMap({ skeleton: this.skeleton })}"
           @input=${this._onInput}
           @keydown=${this._onKeyEvent}
           @keypress=${this._onKeyEvent}>
-          
+
           ${isTextarea ? html`
             ${this._tagsEnabled && !this.skeleton ? html`
               <!--
                 We use this to display colored background rectangles behind space separated values. 
                 This needs to be on the same line and the 2 level parent is important to keep scroll behaviour.
               -->
-              <div class="input input-underlayer" style="--rows: ${rows}"><div class="all-tags">${tags}</div></div>
+              <div class="input input-underlayer" style="--rows: ${rows}">
+                <div class="all-tags">${tags}</div>
+              </div>
             ` : ''}
             <textarea
               id=${this._uniqueName}
@@ -236,7 +254,7 @@ export class CcInputText extends LitElement {
               @focus=${this._onFocus}
             ></textarea>
           ` : ''}
-            
+
           ${!isTextarea ? html`
             ${clipboard && this.readonly ? html`
               <!--
@@ -250,7 +268,7 @@ export class CcInputText extends LitElement {
               id=${this._uniqueName}
               type=${this.secret && !this._showSecret ? 'password' : 'text'}
               class="input"
-              ?disabled=${this.disabled || this.skeleton} 
+              ?disabled=${this.disabled || this.skeleton}
               ?readonly=${this.readonly}
               .value=${value}
               name=${this.name}
@@ -259,17 +277,17 @@ export class CcInputText extends LitElement {
               @focus=${this._onFocus}
             >
           ` : ''}
-        
+
           <div class="ring"></div>
         </div>
-        
+
         ${secret ? html`
-          <button class="btn" @click=${this._onClickSecret} 
+          <button class="btn" @click=${this._onClickSecret}
             title=${this._showSecret ? i18n('cc-input-text.secret.hide') : i18n('cc-input-text.secret.show')}>
             <img class="btn-img" src=${this._showSecret ? eyeClosedSvg : eyeOpenSvg} alt="">
           </button>
         ` : ''}
-        
+
         ${clipboard ? html`
           <button class="btn" @click=${this._onClickCopy} title=${i18n('cc-input-text.clipboard')}>
             <img class="btn-img" src=${this._copyOk ? tickSvg : clipboardSvg} alt="">
