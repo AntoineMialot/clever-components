@@ -11,8 +11,8 @@ import { skeletonStyles } from '../styles/skeleton.js';
 import { ccLink, linkStyles } from '../templates/cc-link.js';
 
 /**
- * @typedef {import('../types').BackupDetails} BackupDetails
- * @typedef {import('../types').Backup} Backup
+ * @typedef {import('./types.js').BackupDetails} BackupDetails
+ * @typedef {import('./types.js').Backup} Backup
  * @typedef {'restore'|'delete'} OverlayType
  */
 
@@ -195,7 +195,7 @@ export class CcAddonBackups extends LitElement {
 
     const skeleton = (this.backups == null);
     const backupDetails = skeleton ? SKELETON_BACKUPS : this.backups;
-    const { providerId, passwordForCommand } = backupDetails;
+    const { providerId, list: backups, passwordForCommand } = backupDetails;
     const hasData = (!this.error && (backups.length > 0));
     const emptyData = (!this.error && (backups.length === 0));
 

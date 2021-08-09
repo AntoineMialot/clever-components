@@ -1,0 +1,69 @@
+export interface Addon {
+  id: string,
+  name: string,
+  provider: AddonProvider,
+  plan: AddonPlan,
+  creationDate: Date | number | string,
+}
+
+interface AddonProvider {
+  name: string,
+  logoUrl: string,
+}
+
+interface AddonPlan {
+  name: string,
+}
+
+export interface BackupDetails {
+  providerId: string,
+  passwordForCommand: string,
+  list: Backup[],
+}
+
+export interface Backup {
+  createdAt: Date,
+  expiresAt: Date
+  url: string,
+  restoreCommand: string,
+  deleteCommand: string,
+}
+
+export interface Credential {
+  type: "auth-token" | "host" | "password" | "url" | "user",
+  value: string,
+  secret: boolean,
+}
+
+export interface Option {
+  name: string,
+  enabled: boolean,
+  // Option specific params
+  flavor: Flavor, // for "apm" and "kibana" options
+  price: number, // for "encryption" option
+}
+
+interface Feature {
+  name: String,
+  value: String,
+}
+
+interface Flavor {
+  name: string,
+  cpus: number,
+  gpus: number,
+  mem: number,
+  microservice: boolean,
+  monthlyCost: number,
+}
+
+interface Link {
+  type: "elasticsearch"|"kibana"|"apm",
+  href?: string,
+}
+
+interface Options {
+  kibana: boolean,
+  apm: boolean,
+}
+

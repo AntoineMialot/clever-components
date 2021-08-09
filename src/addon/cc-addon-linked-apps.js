@@ -16,50 +16,21 @@ const SKELETON_APPLICATIONS = [
 ];
 
 /**
+ * @typedef {import('../types.js').Instance} Instance
+ * @typedef {import('../types.js').InstanceVariant} InstanceVariant
+ * @typedef {import('../types.js').Zone} Zone
+ */
+
+/**
  * A component to display applications linked to an add-on.
  *
  * ## Details
  *
  * * When applications is nullish, a skeleton screen UI pattern is displayed (loading hint).
  *
- * ## Type definitions
- *
- * ```js
- * interface InstanceVariant {
- *   name: string,
- *   logo: string,
- * }
- * ```
- *
- * ```js
- * interface Instance {
- *   variant: InstanceVariant,
- * }
- * ```
- *
- * ```js
- * interface Application {
- *   name: string,
- *   link: string,
- *   instance: Instance,
- *   zone: Zone,
- * }
- * ```
- *
- * ```js
- * interface Zone {
- *   countryCode: string,   // ISO 3166-1 alpha-2 code of the country (2 letters): "FR", "CA", "US"...
- *   city: string,          // Name of the city in english: "Paris", "Montreal", "New York City"...
- *   country: string,       // Name of the country in english: "France", "Canada", "United States"...
- *   displayName?: string,  // Optional display name for private zones (instead of displaying city + country): "ACME (dedicated)"...
- *   tags: string[],        // Array of strings for semantic tags: ["region:eu", "infra:clever-cloud"], ["scope:private"]...
- * }
- * ```
  *
  * @cssdisplay block
  *
- * @prop {Application[]} applications - Sets the linked applications.
- * @prop {Boolean} error - Displays an error message.
  */
 
 export class CcAddonLinkedApps extends LitElement {
@@ -73,6 +44,11 @@ export class CcAddonLinkedApps extends LitElement {
 
   constructor () {
     super();
+
+    /** @type {Application[]} Sets the linked applications. */
+    this.applications = [];
+
+    /** @type {Boolean} Displays an error message. */
     this.error = false;
   }
 
@@ -138,7 +114,7 @@ export class CcAddonLinkedApps extends LitElement {
           height: 1.6rem;
           width: 1.6rem;
         }
-        
+
         .details {
           --cc-align-items: center;
           --cc-gap: 0.5rem;

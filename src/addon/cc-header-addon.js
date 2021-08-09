@@ -9,7 +9,7 @@ import { i18n } from '../lib/i18n.js';
 import { skeletonStyles } from '../styles/skeleton.js';
 
 /**
- * @typedef {import('../types').Addon} Addon
+ * @typedef {import('./types.js').Addon} Addon
  */
 
 /** @type {Addon} */
@@ -46,13 +46,13 @@ export class CcHeaderAddon extends LitElement {
   constructor () {
     super();
 
-    /** @type {Addon} Sets add-on details and config. */
+    /** @type {Addon} Sets add-on details and config */
     this.addon = null;
 
-    /** @type {boolean} Displays an error message. */
+    /** @type {boolean} Displays an error message */
     this.error = false;
 
-    /** @type {string} Sets version of add-on. */
+    /** @type {string} Sets version of add-on */
     this.version = null;
   }
 

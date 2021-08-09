@@ -6,28 +6,14 @@ import { i18n } from '../lib/i18n.js';
 import { ccAddonEncryptionAtRestOption } from '../templates/cc-addon-encryption-at-rest-option.js';
 
 /**
+ * @typedef {import('./types.js').Option} Option
+ * @typedef {import('./types.js').Options} Options
+ */
+
+/**
  * A component that displays the available options of a Redis add-on.
  *
- * ## Type definitions
- *
- * ```js
- * interface Option {
- *   name: string,
- *   enabled: boolean,
- *   // Option specific params
- *   price: number, // for "encryption" option
- * }
- * ```
- *
- * ```js
- * interface Options {
- *   encryption: boolean,
- * }
- * ```
- *
  * @cssdisplay block
- *
- * @prop {Option[]} options - List of options for this add-on.
  *
  * @event {CustomEvent<Options>} cc-addon-redis-options:submit - Fires when the form is submitted.
  */
@@ -41,6 +27,8 @@ export class CcAddonRedisOptions extends LitElement {
 
   constructor () {
     super();
+
+    /** @type {Option[]} List of options for this add-on */
     this.options = [];
   }
 
@@ -56,7 +44,8 @@ export class CcAddonRedisOptions extends LitElement {
             return ccAddonEncryptionAtRestOption(option);
           default:
             return null;
-        };
+        }
+        ;
       })
       .filter((option) => option != null);
   }

@@ -13,10 +13,6 @@ import { i18n } from '../lib/i18n.js';
  *
  * @cssdisplay grid
  *
- * @prop {Boolean} enabled - Enable the option by default.
- * @prop {String} logo - The logo URL of the option.
- * @prop {String} title - Title of the option.
- *
  * @event {CustomEvent<Boolean>} cc-addon-option:input - Fires when the option is enabled or disabled.
  *
  * @slot - The content of the option's description (text or HTML).
@@ -33,8 +29,14 @@ export class CcAddonOption extends LitElement {
 
   constructor () {
     super();
+
+    /** @type {Boolean} Enable the option by default */
     this.enabled = false;
+
+    /** @type {String} The logo URL of the option */
     this.logo = null;
+
+    /** @type {String} Title of the option */
     this.title = null;
   }
 

@@ -1,30 +1,26 @@
-export interface Addon {
-  id: string,
+
+// START:  Belongs to addon
+interface Application {
   name: string,
-  provider: AddonProvider,
-  plan: AddonPlan,
-  creationDate: Date | number | string,
+  link: string,
+  instance: Instance,
+  zone: Zone,
+}
+interface Instance {
+  variant: InstanceVariant,
 }
 
-interface AddonProvider {
+interface InstanceVariant {
   name: string,
-  logoUrl: string,
+  logo: string,
 }
 
-interface AddonPlan {
-  name: string,
-}
+// END
 
-export interface BackupDetails {
-  providerId: string,
-  passwordForCommand: string,
-  list: Backup[],
-}
-
-export interface Backup {
-  createdAt: Date,
-  expiresAt: Date
-  url: string,
-  restoreCommand: string,
-  deleteCommand: string,
+interface Zone {
+  countryCode: string,   // ISO 3166-1 alpha-2 code of the country (2 letters): "FR", "CA", "US"...
+  city: string,          // Name of the city in english: "Paris", "Montreal", "New York City"...
+  country: string,       // Name of the country in english: "France", "Canada", "United States"...
+  displayName?: string,  // Optional display name for private zones (instead of displaying city + country): "ACME (dedicated)"...
+  tags: string[],        // Array of strings for semantic tags: ["region:eu", "infra:clever-cloud"], ["scope:private"]...
 }

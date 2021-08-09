@@ -16,6 +16,10 @@ const APM_LOGO_URL = 'https://static-assets.cellar.services.clever-cloud.com/log
 const ELASTICSEARCH_DOCUMENTATION = 'https://www.clever-cloud.com/doc/addons/elastic/';
 
 /**
+ * @typedef {import('./types.js').Link} Link
+ */
+
+/**
  * A component to display various links (Documentation, kibana, APM) for an elasticsearch service.
  *
  * ## Details
@@ -23,19 +27,7 @@ const ELASTICSEARCH_DOCUMENTATION = 'https://www.clever-cloud.com/doc/addons/ela
  * * You need to list the links you want to display in `links`.
  * * You can omit the `href` property while you wait for the real link, a skeleton UI (loading hint) will be displayed.
  *
- * ## Type definitions
- *
- * ```js
- * interface Link {
- *   type: "elasticsearch"|"kibana"|"apm",
- *   href?: string,
- * }
- * ```
- *
  * @cssdisplay block
- *
- * @prop {Boolean} error - Display an error message.
- * @prop {Link[]} links - Sets the different links.
  */
 export class CcElasticsearchInfo extends LitElement {
 
@@ -48,7 +40,12 @@ export class CcElasticsearchInfo extends LitElement {
 
   constructor () {
     super();
+
+    /** @type {Boolean} Display an error message */
     this.error = false;
+
+    /** @type {Link[]} Sets the different links */
+    this.links = null;
   }
 
   render () {
