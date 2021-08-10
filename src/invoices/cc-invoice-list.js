@@ -21,41 +21,16 @@ function maxFromStrings (strings) {
 }
 
 /**
+ * @typedef {import('./types.js').Amount} Amount
+ * @typedef {import('./types.js').Invoice} Invoice
+ * @typedef {import('./types.js').InvoiceStatus} InvoiceStatus
+ * @typedef {import('./types.js').InvoiceType} InvoiceType
+ */
+
+/**
  * A component to display a list of invoices in paginated categories.
  *
- * ## Type definitions
- *
- * ```js
- * interface Amount {
- *   amount: Number,
- *   currency: String,
- * }
- * ```
- *
- * ```js
- * type InvoiceStatus = "PENDING" | "PROCESSING" | "PAID" | "PAYMENTHELD" | "CANCELED" | "REFUNDED" | "WONTPAY"
- * ```
- *
- * ```js
- * type InvoiceType = "INVOICE" | "CREDITNOTE"
- * ```
- *
- * ```js
- * interface Invoice {
- *   downloadUrl: String,
- *   emissionDate: String,
- *   number: String,
- *   paymentUrl: String,
- *   status: InvoiceStatus,
- *   total: Amount,
- *   type: InvoiceType,
- * }
- * ```
- *
  * @cssdisplay block
- *
- * @prop {Boolean} error - Sets a loading error state.
- * @prop {Invoice[]} invoices - Sets the list of invoices.
  */
 export class CcInvoiceList extends LitElement {
 
@@ -69,7 +44,12 @@ export class CcInvoiceList extends LitElement {
 
   constructor () {
     super();
+
+    /** @type {Boolean} Sets a loading error state */
     this.error = false;
+
+    /** @type {Invoice[]} Sets the list of invoices */
+    this.invoices = null;
   }
 
   _onYearFilterValue ({ detail: year }) {
@@ -153,13 +133,13 @@ export class CcInvoiceList extends LitElement {
     return [
       // language=CSS
       css`
-        :host {
-          display: block;
-        }
+          :host {
+              display: block;
+          }
 
-        cc-toggle {
-          justify-self: start;
-        }
+          cc-toggle {
+              justify-self: start;
+          }
       `,
     ];
   }

@@ -19,43 +19,16 @@ const SKELETON_INVOICE = {
 };
 
 /**
+ * @typedef {import('./types.js').Amount} Amount
+ * @typedef {import('./types.js').Invoice} Invoice
+ * @typedef {import('./types.js').InvoiceStatus} InvoiceStatus
+ * @typedef {import('./types.js').InvoiceType} InvoiceType
+ */
+
+/**
  * A block component to display an HTML invoice.
  *
- * ## Type definitions
- *
- * ```js
- * interface Amount {
- *   amount: Number,
- *   currency: String,
- * }
- * ```
- *
- * ```js
- * type InvoiceStatus = "PENDING" | "PROCESSING" | "PAID" | "PAYMENTHELD" | "CANCELED" | "REFUNDED" | "WONTPAY"
- * ```
- *
- * ```js
- * type InvoiceType = "INVOICE" | "CREDITNOTE"
- * ```
- *
- * ```js
- * interface Invoice {
- *   downloadUrl: String,
- *   emissionDate: String,
- *   invoiceHtml: String,
- *   number: String,
- *   paymentUrl: String,
- *   status: InvoiceStatus,
- *   total: Amount,
- *   type: InvoiceType,
- * }
- * ```
- *
  * @cssdisplay block
- *
- * @prop {Boolean} error - Sets a loading error state.
- * @prop {Invoice} invoice - Sets the invoice.
- * @prop {String} number - Sets the invoice number.
  */
 export class CcInvoice extends LitElement {
 
@@ -69,7 +42,15 @@ export class CcInvoice extends LitElement {
 
   constructor () {
     super();
+
+    /** @type {Boolean} Sets a loading error state */
     this.error = false;
+
+    /** @type {Invoice} Sets the invoice */
+    this.invoice = null;
+
+    /** @type {String} Sets the invoice number */
+    this.number = null;
   }
 
   render () {
@@ -106,35 +87,35 @@ export class CcInvoice extends LitElement {
       skeletonStyles,
       // language=CSS
       css`
-        :host {
-          display: block;
-        }
+          :host {
+              display: block;
+          }
 
-        [slot="button"] {
-          align-self: start;
-          margin-left: 1rem;
-        }
+          [slot="button"] {
+              align-self: start;
+              margin-left: 1rem;
+          }
 
-        .has-errors {
-          --cc-skeleton-state: paused;
-        }
+          .has-errors {
+              --cc-skeleton-state: paused;
+          }
 
-        .skeleton {
-          background-color: #bbb;
-        }
-        
-        .info,
-        .frame {
-          justify-self: center;
-        }
+          .skeleton {
+              background-color: #bbb;
+          }
 
-        .frame {
-          /* height and max-width are roughly set to have a standard letter / A4 paper ratio */
-          box-shadow: 0 0 0.5rem #ccc;
-          height: 31cm;
-          max-width: 22cm;
-          width: 100%;
-        }
+          .info,
+          .frame {
+              justify-self: center;
+          }
+
+          .frame {
+              /* height and max-width are roughly set to have a standard letter / A4 paper ratio */
+              box-shadow: 0 0 0.5rem #ccc;
+              height: 31cm;
+              max-width: 22cm;
+              width: 100%;
+          }
       `,
     ];
   }

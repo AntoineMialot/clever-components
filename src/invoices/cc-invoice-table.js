@@ -27,38 +27,8 @@ const SKELETON_INVOICES = [
 /**
  * A table component to display a list of invoices.
  *
- * ## Type definitions
- *
- * ```js
- * interface Amount {
- *   amount: Number,
- *   currency: String,
- * }
- * ```
- *
- * ```js
- * type InvoiceStatus = "PENDING" | "PROCESSING" | "PAID" | "PAYMENTHELD" | "CANCELED" | "REFUNDED" | "WONTPAY"
- * ```
- *
- * ```js
- * type InvoiceType = "INVOICE" | "CREDITNOTE"
- * ```
- *
- * ```js
- * interface Invoice {
- *   downloadUrl: String,
- *   emissionDate: String,
- *   number: String,
- *   paymentUrl: String,
- *   status: InvoiceStatus,
- *   total: Amount,
- *   type: InvoiceType,
- * }
- * ```
- *
  * @cssdisplay block
  *
- * @prop {Invoice[]} invoices - Sets the list of invoices.
  */
 export class CcInvoiceTable extends withResizeObserver(LitElement) {
 
@@ -67,6 +37,13 @@ export class CcInvoiceTable extends withResizeObserver(LitElement) {
       invoices: { type: Array },
       _width: { type: Number },
     };
+  }
+
+  constructor () {
+    super();
+
+    /** @type {Invoice[]} Sets the list of invoices */
+    this.invoices = null;
   }
 
   onResize ({ width }) {
@@ -112,8 +89,8 @@ export class CcInvoiceTable extends withResizeObserver(LitElement) {
             <cc-img class="invoice-icon" src=${fileSvg}></cc-img>
             <div class="invoice-text ${classMap({ skeleton })}">
               ${i18n('cc-invoice-table.text', {
-      number: invoice.number, date: invoice.emissionDate, amount: invoice.total.amount,
-    })}
+                number: invoice.number, date: invoice.emissionDate, amount: invoice.total.amount,
+              })}
               <br>
               ${this._renderLinks(skeleton, invoice)}
             </div>
@@ -168,112 +145,112 @@ export class CcInvoiceTable extends withResizeObserver(LitElement) {
       linkStyles,
       // language=CSS
       css`
-        :host {
-          display: block;
-        }
-        
-        /* we should use a class (something like "number-value") but it's not possible right now in i18n */
-        code {
-          font-family: var(--cc-ff-monospace);
-          font-size: 1rem;
-        }
+          :host {
+              display: block;
+          }
 
-        .credit-note {
-          font-style: italic;
-        }
+          /* we should use a class (something like "number-value") but it's not possible right now in i18n */
+          code {
+              font-family: var(--cc-ff-monospace);
+              font-size: 1rem;
+          }
 
-        .cc-link {
-          white-space: nowrap;
-        }
+          .credit-note {
+              font-style: italic;
+          }
 
-        .links {
-          --cc-gap: 1rem;
-          --cc-align-items: center;
-        }
-        
-        /* SMALL MODE */
+          .cc-link {
+              white-space: nowrap;
+          }
 
-        .invoice-list {
-          display: grid;
-          gap: 1.5rem;
-        }
+          .links {
+              --cc-gap: 1rem;
+              --cc-align-items: center;
+          }
 
-        .invoice {
-          display: flex;
-          line-height: 1.5rem;
-        }
+          /* SMALL MODE */
 
-        .invoice-icon,
-        .invoice-text {
-          margin-right: 0.5rem;
-        }
+          .invoice-list {
+              display: grid;
+              gap: 1.5rem;
+          }
 
-        .invoice-icon {
-          flex: 0 0 auto;
-          height: 1.5rem;
-          width: 1.5rem;
-        }
+          .invoice {
+              display: flex;
+              line-height: 1.5rem;
+          }
 
-        .invoice-text {
-          color: #555;
-        }
+          .invoice-icon,
+          .invoice-text {
+              margin-right: 0.5rem;
+          }
 
-        .invoice-text code,
-        .invoice-text strong {
-          color: #000;
-          font-weight: bold;
-          white-space: nowrap;
-        }
+          .invoice-icon {
+              flex: 0 0 auto;
+              height: 1.5rem;
+              width: 1.5rem;
+          }
 
-        .invoice-list .skeleton code,
-        .invoice-list .skeleton strong {
-          background-color: #bbb;
-          color: transparent;
-        }
+          .invoice-text {
+              color: #555;
+          }
 
-        /* BIG MODE */
-        
-        table {
-          border-collapse: collapse;
-          border-radius: 5px;
-          overflow: hidden;
-        }
-        
-        th,
-        td {
-          padding: 0.5rem 1rem;
-          text-align: left;
-        }
+          .invoice-text code,
+          .invoice-text strong {
+              color: #000;
+              font-weight: bold;
+              white-space: nowrap;
+          }
 
-        th {
-          background-color: #eee;
-        }
+          .invoice-list .skeleton code,
+          .invoice-list .skeleton strong {
+              background-color: #bbb;
+              color: transparent;
+          }
 
-        td {
-          background-color: #fafafa;
-        }
+          /* BIG MODE */
 
-        tr:not(:last-child) td {
-          border-bottom: 1px solid #ddd;
-        }
-        
-        /* applied on th and td */
-        .number {
-          text-align: right;
-        }
+          table {
+              border-collapse: collapse;
+              border-radius: 5px;
+              overflow: hidden;
+          }
 
-        td.number {
-          /* "-ø###,###.##" OR "-### ###,## ø" => 13ch */
-          min-width: 13ch;
-        }
-        
-        tr:hover td {
-          background-color: #f5f5f5;
-        }
+          th,
+          td {
+              padding: 0.5rem 1rem;
+              text-align: left;
+          }
 
-        table .skeleton {
-          background-color: #bbb;
-        }
+          th {
+              background-color: #eee;
+          }
+
+          td {
+              background-color: #fafafa;
+          }
+
+          tr:not(:last-child) td {
+              border-bottom: 1px solid #ddd;
+          }
+
+          /* applied on th and td */
+          .number {
+              text-align: right;
+          }
+
+          td.number {
+              /* "-ø###,###.##" OR "-### ###,## ø" => 13ch */
+              min-width: 13ch;
+          }
+
+          tr:hover td {
+              background-color: #f5f5f5;
+          }
+
+          table .skeleton {
+              background-color: #bbb;
+          }
       `,
     ];
   }
