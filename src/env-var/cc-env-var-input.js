@@ -9,22 +9,12 @@ import { defaultThemeStyles } from '../styles/default-theme.js';
 import { skeletonStyles } from '../styles/skeleton.js';
 
 /**
+ * @typedef {import('./types.js').Variable} Variable
+ * @typedef {import('./types.js').VariableName} VariableName
+ */
+
+/**
  * A small input to manipulate an environement variable.
- *
- * ## Type definitions
- *
- * ```js
- * interface Variable {
- *   name: string,
- *   value: string,
- * }
- * ```
- *
- * ```js
- * interface VariableName {
- *   name: string,
- * }
- * ```
  *
  * @cssdisplay block
  *
@@ -61,12 +51,29 @@ export class CcEnvVarInput extends LitElement {
 
   constructor () {
     super();
+
+    /** @type {Boolean} Declares the variable as "should be deleted" */
     this.deleted = false;
+
+    /** @type {Boolean} Sets `disabled` attribute on input and button */
     this.disabled = false;
+
+    /** @type {Boolean} Declares the variable as "edited" (compared to server side state) */
     this.edited = false;
+
+    /** @type {String} Sets the name of the environment variable */
+    this.name = null;
+
+    /** @type {Boolean}  Declares the variable as "new" (compared to server side state) */
     this.new = false;
+
+    /** @type {Boolean} Sets `readonly` attribute on input and hides button */
     this.readonly = false;
+
+    /** @type {Boolean} Enables skeleton screen UI pattern (loading hint) */
     this.skeleton = false;
+
+    /** @type {String} Sets the value of the environment variable (can be empty) */
     this.value = '';
   }
 
@@ -91,9 +98,9 @@ export class CcEnvVarInput extends LitElement {
         <span class="name ${classMap({ deleted: this.deleted })}"><!-- no-whitespace
           --><span class=${classMap({ skeleton: this.skeleton })}>${this.name}</span><!-- no-whitespace
         --></span>
-        
+
         <cc-flex-gap class="input-btn">
-          
+
           <cc-input-text
             class="value"
             name=${this.name}
@@ -106,7 +113,7 @@ export class CcEnvVarInput extends LitElement {
             placeholder=${i18n('cc-env-var-input.value-placeholder')}
             @cc-input-text:input=${this._onInput}
           ></cc-input-text>
-          
+
           ${!this.readonly ? html`
             <cc-button
               ?skeleton=${this.skeleton}
@@ -118,7 +125,7 @@ export class CcEnvVarInput extends LitElement {
               ${this.deleted ? i18n('cc-env-var-input.keep-button') : i18n('cc-env-var-input.delete-button')}
             </cc-button>
           ` : ''}
-          
+
         </cc-flex-gap>
       </cc-flex-gap>
     `;

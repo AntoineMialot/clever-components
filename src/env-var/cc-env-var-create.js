@@ -9,6 +9,10 @@ import { i18n } from '../lib/i18n.js';
 import { defaultThemeStyles } from '../styles/default-theme.js';
 
 /**
+ * @typedef {import('./types.js').Variable} Variable
+ */
+
+/**
  * A small form to create a new environment variable with validations on the name.
  *
  * ## Details
@@ -16,19 +20,7 @@ import { defaultThemeStyles } from '../styles/default-theme.js';
  * * The validation of the variable name format is handled with [@clevercloud/client](https://github.com/CleverCloud/clever-client.js/blob/master/esm/utils/env-vars.js)
  * * The validation of existing names is handled with the `variablesNames` property which is a list of already existing names.
  *
- * ## Type definitions
- *
- * ```js
- * interface Variable {
- *   name: string,
- *   value: string,
- * }
- * ```
- *
  * @cssdisplay block
- *
- * @prop {Boolean} disabled - Sets `disabled` attribute on inputs and button.
- * @prop {String[]} variablesNames - Sets list of existing variables names (so we can display an error if it already exists).
  *
  * @event {CustomEvent<Variable>} cc-env-var-create:create - Fires the variable whenever the add button is clicked.
  */
@@ -45,8 +37,13 @@ export class CcEnvVarCreate extends LitElement {
 
   constructor () {
     super();
+
+    /** @type {Boolean} Sets `disabled` attribute on inputs and button */
     this.disabled = false;
+
+    /** @type {String[]}  Sets list of existing variables names (so we can display an error if it already exists) */
     this.variablesNames = [];
+
     this.reset();
   }
 
@@ -89,7 +86,7 @@ export class CcEnvVarCreate extends LitElement {
 
     return html`
       <cc-flex-gap>
-        
+
         <cc-input-text
           class="name"
           name="name"
@@ -99,9 +96,9 @@ export class CcEnvVarCreate extends LitElement {
           @cc-input-text:input=${this._onNameInput}
           @cc-input-text:requestimplicitsubmit=${(e) => this._onRequestSubmit(e, hasErrors)}
         ></cc-input-text>
-        
+
         <cc-flex-gap class="input-btn">
-          
+
           <cc-input-text
             class="value"
             name="value"
@@ -112,16 +109,17 @@ export class CcEnvVarCreate extends LitElement {
             @cc-input-text:input=${this._onValueInput}
             @cc-input-text:requestimplicitsubmit=${(e) => this._onRequestSubmit(e, hasErrors)}
           ></cc-input-text>
-          
+
           <cc-button
             primary
             ?disabled=${hasErrors || this.disabled}
             @cc-button:click=${this._onSubmit}
-          >${i18n('cc-env-var-create.create-button')}</cc-button>
-          
+          >${i18n('cc-env-var-create.create-button')}
+          </cc-button>
+
         </cc-flex-gap>
       </cc-flex-gap>
-      
+
       ${(isNameInvalid && this._variableName !== '') ? html`
         <cc-error>${i18n(`cc-env-var-create.errors.invalid-name`, { name: this._variableName })}</cc-error>
       ` : ''}

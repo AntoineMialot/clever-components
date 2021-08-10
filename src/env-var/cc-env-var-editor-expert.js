@@ -13,23 +13,13 @@ const SKELETON_VARIABLES = [
 ];
 
 /**
+ * @typedef {import('./types.js').Variable} Variable
+ */
+
+/**
  * A high level environment variable editor to create/edit/delete all variables at once as a big string (properly parsed with validation and error messages).
  *
- * ## Type definitions
- *
- * ```js
- * interface Variable {
- *   name: string,
- *   value: string,
- *   isDeleted: boolean,
- * }
- * ```
- *
  * @cssdisplay block / none (with `[hidden]`)
- *
- * @prop {Boolean} disabled - Sets `disabled` attribute on inputs and buttons.
- * @prop {Boolean} readonly - Sets `readonly` attribute on main input and hides buttons.
- * @prop {Variable[]} variables - Sets the list of variables.
  *
  * @event {CustomEvent<Variable[]>} cc-env-var-editor-expert:change - Fires the new list of variables whenever something changes in the list.
  */
@@ -48,12 +38,20 @@ export class CcEnvVarEditorExpert extends LitElement {
 
   constructor () {
     super();
+
+    /** @type {Boolean} Sets `disabled` attribute on inputs and buttons */
+    this.disabled = false;
+
+    /** @type {Boolean} Sets `readonly` attribute on main input and hides buttons */
+    this.readonly = false;
+
+    /** @type {Variable[]} Sets the list of variables */
+    this.variables = null;
+
     // lit-analyzer needs this
     this._skeleton = false;
     // Triggers setter (init _skeleton, _variablesAsText and _errors)
-    this.variables = null;
-    this.disabled = false;
-    this.readonly = false;
+
   }
 
   _setErrors (rawErrors) {
