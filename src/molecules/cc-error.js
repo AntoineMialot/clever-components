@@ -18,8 +18,6 @@ const warningSvg = new URL('../assets/warning.svg', import.meta.url).href;
  *
  * @cssdisplay block
  *
- * @prop {"inline"|"info"|"loading"|"confirm"} mode - Sets the displays mode (see details).
- *
  * @event {CustomEvent} cc-error:ok - Fires when the OK button is clicked.
  *
  * @slot - The content of the error message.
@@ -34,6 +32,8 @@ export class CcError extends LitElement {
 
   constructor () {
     super();
+
+    /** @type {"inline"|"info"|"loading"|"confirm"}  Sets the displays mode (see details) */
     this.mode = 'inline';
   }
 
@@ -46,7 +46,9 @@ export class CcError extends LitElement {
       ${this.mode === 'loading' ? html`
         <cc-loader></cc-loader>
       ` : ''}
-      <div><img src=${warningSvg} alt=""><slot></slot></div>
+      <div><img src=${warningSvg} alt="">
+        <slot></slot>
+      </div>
       ${this.mode === 'confirm' ? html`
         <cc-button @cc-button:click=${this._onOkClick}>${i18n('cc-error.ok')}</cc-button>
       ` : ''}
@@ -57,46 +59,46 @@ export class CcError extends LitElement {
     return [
       // language=CSS
       css`
-        :host {
-          display: block;
-        }
+          :host {
+              display: block;
+          }
 
-        :host([mode="info"]),
-        :host([mode="loading"]),
-        :host([mode="confirm"]) {
-          align-items: center;
-          background-color: white;
-          border: 1px solid #bcc2d1;
-          border-radius: 0.25rem;
-          box-shadow: 0 0 1rem #aaa;
-          display: grid;
-          grid-gap: 1rem;
-          justify-content: center;
-          justify-items: center;
-          padding: 1rem;
-        }
+          :host([mode="info"]),
+          :host([mode="loading"]),
+          :host([mode="confirm"]) {
+              align-items: center;
+              background-color: white;
+              border: 1px solid #bcc2d1;
+              border-radius: 0.25rem;
+              box-shadow: 0 0 1rem #aaa;
+              display: grid;
+              grid-gap: 1rem;
+              justify-content: center;
+              justify-items: center;
+              padding: 1rem;
+          }
 
-        :host([mode="loading"]) {
-          grid-template-columns: min-content auto;
-        }
+          :host([mode="loading"]) {
+              grid-template-columns: min-content auto;
+          }
 
-        cc-loader {
-          height: 1.5rem;
-          width: 1.5rem;
-        }
+          cc-loader {
+              height: 1.5rem;
+              width: 1.5rem;
+          }
 
-        img {
-          display: inline-block;
-          height: 1rem;
-          margin-right: 0.4rem;
-          margin-top: 0.1rem;
-          vertical-align: text-top;
-          width: 1rem;
-        }
+          img {
+              display: inline-block;
+              height: 1rem;
+              margin-right: 0.4rem;
+              margin-top: 0.1rem;
+              vertical-align: text-top;
+              width: 1rem;
+          }
 
-        cc-button {
-          display: block;
-        }
+          cc-button {
+              display: block;
+          }
       `,
     ];
   }

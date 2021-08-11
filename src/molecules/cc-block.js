@@ -17,11 +17,6 @@ const upSvg = new URL('../assets/up.svg', import.meta.url).href;
  *
  * @cssdisplay grid
  *
- * @prop {String} icon - Sets the URL of the image before the title. Icon is hidden if nullish.
- * @prop {Boolean} noHead - Hides the head section.
- * @prop {String} ribbon - Adds a ribbon on the top left corner if it is not empty.
- * @prop {"off"|"open"|"close"} state - Sets the state of the toggle behaviour.
- *
  * @slot - The main content of the block. The direct children of this will be spaced in a 1 column CSS grid.
  * @slot button - A zone dedicated for a button/toggle in the to right corner.
  * @slot overlay - The content to display on top of the main content.
@@ -41,8 +36,19 @@ export class CcBlock extends LitElement {
 
   constructor () {
     super();
+
+    /** @type {String} Sets the URL of the image before the title. Icon is hidden if nullish */
+    this.icon = null;
+
+    /** @type {Boolean} Hides the head section */
     this.noHead = false;
+
+    /** @type {String} Adds a ribbon on the top left corner if it is not empty */
+    this.ribbon = null;
+
+    /** @type {"off"|"open"|"close"} Sets the state of the toggle behaviour */
     this.state = 'off';
+
     this._overlay = false;
   }
 
@@ -119,11 +125,11 @@ export class CcBlock extends LitElement {
           position: relative;
         }
 
-        .head {
-          align-items: center;
-          display: flex;
-          padding: 1rem;
-        }
+          .head {
+              align-items: center;
+              display: flex;
+              padding: 1rem;
+          }
 
         :host([ribbon]) .head {
           padding-left: 3.5rem;
@@ -135,13 +141,13 @@ export class CcBlock extends LitElement {
           cursor: pointer;
         }
 
-        cc-img {
-          align-self: flex-start;
-          border-radius: 0.25rem;
-          height: 1.5rem;
-          margin-right: 1rem;
-          width: 1.5rem;
-        }
+          cc-img {
+              align-self: flex-start;
+              border-radius: 0.25rem;
+              height: 1.5rem;
+              margin-right: 1rem;
+              width: 1.5rem;
+          }
 
         ::slotted([slot="title"]) {
           color: #3A3871;
@@ -171,11 +177,11 @@ export class CcBlock extends LitElement {
         }
 
 
-        .main {
-          display: grid;
-          grid-gap: 1rem;
-          padding: 0.5rem 1rem 1rem;
-        }
+          .main {
+              display: grid;
+              grid-gap: 1rem;
+              padding: 0.5rem 1rem 1rem;
+          }
 
         :host([no-head]) .main {
           padding: 1rem;
@@ -186,11 +192,11 @@ export class CcBlock extends LitElement {
           opacity: 0.35;
         }
 
-        /* superpose main and overlay */
-        .main-wrapper,
-        ::slotted([slot="overlay"]) {
-          grid-area: 2 / 1 / auto / auto;
-        }
+          /* superpose main and overlay */
+          .main-wrapper,
+          ::slotted([slot="overlay"]) {
+              grid-area: 2 / 1 / auto / auto;
+          }
 
         :host([ribbon]) .main-wrapper {
           padding-left: 2.5rem;
