@@ -23,11 +23,6 @@ const COLOR_PALETTE = [
  *
  * @cssdisplay inline-block
  *
- * @prop {Array} anchor - Exposes the coordinates of the "tip" of the marker, relative to its top left corner: `[x, y]` (used by `<cc-map>`).
- * @prop {Number} count - Sets an abstract value for this marker to vary the color grading.
- * @prop {Array} size - Exposes the size of the marker: `[width, height]` (used by `<cc-map>`).
- * @prop {Array} tooltip - Exposes the coordinates from which tooltips will "open", relative to the marker anchor: `[width, height]` (used by `<cc-map>`).
- *
  * @cssprop {Number} --cc-map-marker-dot-size - The size of the dot (defaults to 6px).
  */
 export class CcMapMarkerDot extends LitElement {
@@ -37,6 +32,22 @@ export class CcMapMarkerDot extends LitElement {
       count: { type: Number, reflect: true },
       _color: { type: String },
     };
+  }
+
+  constructor () {
+    super();
+
+    /** @type {Array} Exposes the coordinates of the "tip" of the marker, relative to its top left corner: `[x, y]` (used by `<cc-map>`) */
+    this.anchor = null;
+
+    /** @type {Number} Sets an abstract value for this marker to vary the color grading */
+    this.count = null;
+
+    /** @type {Array} Exposes the size of the marker: `[width, height]` (used by `<cc-map>`) */
+    this.size = null;
+
+    /** @type {Array} Exposes the coordinates from which tooltips will "open", relative to the marker anchor: `[width, height]` (used by `<cc-map>`) */
+    this.tooltip = null;
   }
 
   /** @readonly */
@@ -100,32 +111,32 @@ export class CcMapMarkerDot extends LitElement {
     return [
       // language=CSS
       css`
-        :host {
-          /* Make sure container size adapts to inner div */
-          display: inline-block;
-        }
+          :host {
+              /* Make sure container size adapts to inner div */
+              display: inline-block;
+          }
 
-        div {
-          --dot-size: var(--cc-map-marker-dot-size, 6px);
-          animation: pulse 2s infinite;
-          background: var(--dot-color);
-          border-radius: 50%;
-          cursor: pointer;
-          height: var(--dot-size);
-          width: var(--dot-size);
-        }
+          div {
+              --dot-size: var(--cc-map-marker-dot-size, 6px);
+              animation: pulse 2s infinite;
+              background: var(--dot-color);
+              border-radius: 50%;
+              cursor: pointer;
+              height: var(--dot-size);
+              width: var(--dot-size);
+          }
 
-        @keyframes pulse {
-          0% {
-            box-shadow: 0 0 0 0 var(--dot-color-half);
+          @keyframes pulse {
+              0% {
+                  box-shadow: 0 0 0 0 var(--dot-color-half);
+              }
+              70% {
+                  box-shadow: 0 0 0 var(--dot-size) var(--dot-color-zero);
+              }
+              100% {
+                  box-shadow: 0 0 0 0 var(--dot-color-zero);
+              }
           }
-          70% {
-            box-shadow: 0 0 0 var(--dot-size) var(--dot-color-zero);
-          }
-          100% {
-            box-shadow: 0 0 0 0 var(--dot-color-zero);
-          }
-        }
       `,
     ];
   }

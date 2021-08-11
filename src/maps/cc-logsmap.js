@@ -6,6 +6,10 @@ import { dispatchCustomEvent } from '../lib/events.js';
 import { i18n } from '../lib/i18n.js';
 
 /**
+ * @typedef {import('./types.js').HeatmapPoint} HeatmapPoint
+ */
+
+/**
  * World map of access logs with two modes: blinking dots or heatmap.
  *
  * ## Details
@@ -15,43 +19,7 @@ import { i18n } from '../lib/i18n.js';
  * * The legend is contextualized to an organization or an app so you MUST set either `orgaName` or `appName` but not both.
  * * The component has a default height of 15rem and a default width 20rem but this can be overridden with CSS.
  *
- * ## Type definitions
- *
- * ```js
- * interface Point {
- *   lat: number,           // Latitude
- *   lon: number,           // Longitude
- *   count?: number,        // Number of occurences for this location (default: 1)
- *   delay?: number|string, // How long the point needs to stay (in ms), 'none' for a fixed point, (default: 1000)
- *   tooltip?: string,      // Tooltip when the point is hovered
- * }
- * ```
- *
- * ```js
- * interface PointsOptions {
- *   spreadDuration?: boolean|number, // Spread points appearance over a time window (in ms)
- * }
- * ```
- *
- * ```js
- * interface HeatmapPoint {
- *   lat: number,   // Latitude
- *   lon: number,   // Longitude
- *   count: number, // Number of occurences for this location
- * }
- * ```
- *
  * @cssdisplay block
- *
- * @prop {String} appName - Sets the name of the app for which we display the logs (don't use it with `orgaName`).
- * @prop {Number} centerLat - Sets the latitude center of the map.
- * @prop {Number} centerLon - Sets the longitude center of the map.
- * @prop {Boolean} error - Displays an error message (can be combined with `loading`).
- * @prop {HeatmapPoint[]} heatmapPoints - Sets the list of points used to draw the heatmap.
- * @prop {Boolean} loading - Displays a loader on top of the map (can be combined with `error`).
- * @prop {"points"|"heatmap"} mode - Sets map mode: `"points"` for blinking temporary dots and `"heatmap"` for a heatmap.
- * @prop {String} orgaName - Sets the name of the organization for which we display the logs (don't use it with `appName`).
- * @prop {Number} viewZoom - Sets the zoom of the map (between 1 and 6).
  *
  * @event {"points"|"heatmap"} cc-logsmap:mode - Fires the selected mode whenever the toggle changes.
  */
@@ -75,15 +43,36 @@ export class CcLogsMap extends LitElement {
 
   constructor () {
     super();
+
+    /** @type {String} Sets the name of the app for which we display the logs (don't use it with `orgaName`) */
+    this.appName = null;
+
     // Centered on Paris by default
+    /** @type {Number} Sets the latitude center of the map */
     this.centerLat = 48.9;
+    /** @type {Number} Sets the longitude center of the map */
     this.centerLon = 2.4;
+
+    /** @type {Boolean} Displays an error message (can be combined with `loading`) */
     this.error = false;
-    // this.heatmapPoints = [];
+
+    /** @type {HeatmapPoint[]} Sets the list of points used to draw the heatmap */
+    this.heatmapPoints = null;
+
+    /** @type {Boolean} Displays a loader on top of the map (can be combined with `error`) */
     this.loading = false;
+
+    /** @type {"points"|"heatmap"} Sets map mode: `"points"` for blinking temporary dots and `"heatmap"` for a heatmap */
     this.mode = 'points';
+
+    /** @type {String} Sets the name of the organization for which we display the logs (don't use it with `appName`) */
+    this.orgaName = null;
+
+    /** @type {Number} Sets the zoom of the map (between 1 and 6) */
     this.viewZoom = 2;
+
     this._points = [];
+
     this._pointsByCoords = {};
   }
 
@@ -197,7 +186,8 @@ export class CcLogsMap extends LitElement {
         ?error=${this.error}
         .heatmapPoints=${this.heatmapPoints}
         .points=${this._points}
-      >${this._getLegend()}</cc-map>
+      >${this._getLegend()}
+      </cc-map>
     `;
   }
 
@@ -209,55 +199,55 @@ export class CcLogsMap extends LitElement {
   static get styles () {
     // language=CSS
     return css`
-      :host {
-        border: 1px solid #ccc;
-        border-radius: 0.25rem;
-        display: block;
-        height: 15rem;
-        overflow: hidden;
-        position: relative;
-        width: 20rem;
-      }
+        :host {
+            border: 1px solid #ccc;
+            border-radius: 0.25rem;
+            display: block;
+            height: 15rem;
+            overflow: hidden;
+            position: relative;
+            width: 20rem;
+        }
 
-      cc-toggle {
-        left: 0.5rem;
-        position: absolute;
-        top: 0.5rem;
-        z-index: 2;
-      }
+        cc-toggle {
+            left: 0.5rem;
+            position: absolute;
+            top: 0.5rem;
+            z-index: 2;
+        }
 
-      cc-map {
-        height: 100%;
-        left: 0;
-        position: absolute;
-        top: 0;
-        width: 100%;
-        z-index: 1;
-      }
+        cc-map {
+            height: 100%;
+            left: 0;
+            position: absolute;
+            top: 0;
+            width: 100%;
+            z-index: 1;
+        }
 
-      cc-map[view-zoom="1"] {
-        --cc-map-marker-dot-size: 6px;
-      }
+        cc-map[view-zoom="1"] {
+            --cc-map-marker-dot-size: 6px;
+        }
 
-      cc-map[view-zoom="2"] {
-        --cc-map-marker-dot-size: 8px;
-      }
+        cc-map[view-zoom="2"] {
+            --cc-map-marker-dot-size: 8px;
+        }
 
-      cc-map[view-zoom="3"] {
-        --cc-map-marker-dot-size: 10px;
-      }
+        cc-map[view-zoom="3"] {
+            --cc-map-marker-dot-size: 10px;
+        }
 
-      cc-map[view-zoom="4"] {
-        --cc-map-marker-dot-size: 12px;
-      }
+        cc-map[view-zoom="4"] {
+            --cc-map-marker-dot-size: 12px;
+        }
 
-      cc-map[view-zoom="5"] {
-        --cc-map-marker-dot-size: 14px;
-      }
+        cc-map[view-zoom="5"] {
+            --cc-map-marker-dot-size: 14px;
+        }
 
-      cc-map[view-zoom="6"] {
-        --cc-map-marker-dot-size: 16px;
-      }
+        cc-map[view-zoom="6"] {
+            --cc-map-marker-dot-size: 16px;
+        }
     `;
   }
 }

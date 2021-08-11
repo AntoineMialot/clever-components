@@ -25,6 +25,10 @@ const SKELETON_INVOICES = [
 ];
 
 /**
+ * @typedef {import('./types.js').Invoice} Invoice
+ */
+
+/**
  * A table component to display a list of invoices.
  *
  * @cssdisplay block

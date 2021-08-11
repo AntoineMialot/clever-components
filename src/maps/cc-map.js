@@ -10,6 +10,11 @@ import { withResizeObserver } from '../mixins/with-resize-observer.js';
 import { leafletStyles } from '../styles/leaflet.js';
 
 /**
+ * @typedef {import('./types.js').Point} Point
+ * @typedef {import('./types.js').HeatmapPoint} HeatmapPoint
+ */
+
+/**
  * World map with two modes: positioned markers or heatmap.
  *
  * ## Details
@@ -19,50 +24,7 @@ import { leafletStyles } from '../styles/leaflet.js';
  * * The marker DOM element should expose `size`, `anchor` and `tooltip` to help this component place the marker and tooltip correctly on the map.
  * * When using `points`, you can specify some text for the tooltip but you can also specify which HTML tag to use to create and display the tooltip.
  *
- * ## Type definitions
- *
- * ```js
- * interface Point {
- *   lat: number,              // Latitude
- *   lon: number,              // Longitude
- *   marker: Marker,           // An object describing how to create a marker with a custom element.
- *   tooltip: string|Tooltip,  // Simple string or an object describing how to create a tooltip with a custom element.
- *   zIndexOffset: number,     // The offset to add to the automatic offset already defined for a given point.
- * }
- * ```
- *
- * ```js
- * interface Marker {
- *   tag: string,              // The HTML tag name used for the marker
- *   // Additional specific properties for the marker custom element.
- * }
- * ```
- *
- * ```js
- * interface Tooltip {
- *   tag: string,              // The HTML tag name used for the tooltip
- *   // Additional specific properties for the tooltip custom element.
- * }
- * ```
- *
- * ```js
- * interface HeatmapPoint {
- *   lat: number,   // Latitude
- *   lon: number,   // Longitude
- *   count: number, // Number of occurences for this location
- * }
- * ```
- *
  * @cssdisplay flex
- *
- * @prop {Number} centerLat - Sets the latitude center of the map.
- * @prop {Number} centerLon - Sets the longitude center of the map.
- * @prop {Boolean} error - Displays an error message (can be combined with `loading`).
- * @prop {HeatmapPoint[]} heatmapPoints - Sets the list of points used to draw the heatmap.
- * @prop {Boolean} loading - Displays a loader on top of the map (can be combined with `error`).
- * @prop {"points"|"heatmap"} mode - Sets map mode: `"points"` for points with custom markers and `"heatmap"` for a heatmap.
- * @prop {Point[]} points - Sets the list of points used to place markers.
- * @prop {Number} viewZoom - Sets the zoom of the map (between 1 and 6).
  *
  * @event {CustomEvent<Point>} cc-map:marker-click - Fires the corresponding point whenever a marker is clicked.
  * @event {CustomEvent<Point>} cc-map:marker-enter - Fires the corresponding point whenever a marker is entered by the mouse.
@@ -87,13 +49,28 @@ export class CcMap extends withResizeObserver(LitElement) {
 
   constructor () {
     super();
+
     // Centered on Paris by default
+    /** @type {Number} Sets the latitude center of the map */
     this.centerLat = 48.9;
+    /** @type {Number} Sets the longitude center of the map */
     this.centerLon = 2.4;
+
+    /** @type {Boolean} Displays an error message (can be combined with `loading`) */
     this.error = false;
+
+    /** @type {HeatmapPoint[]} Sets the list of points used to draw the heatmap */
+    this.heatmapPoints = null;
+
+    /** @type {Boolean} Displays a loader on top of the map (can be combined with `error`) */
     this.loading = false;
+
+    /** @type {"points"|"heatmap"} Sets map mode: `"points"` for points with custom markers and `"heatmap"` for a heatmap */
     this.mode = 'points';
+
+    /** @type {Number} Sets the zoom of the map (between 1 and 6) */
     this.viewZoom = 2;
+
     this._pointsCache = {};
   }
 
@@ -337,7 +314,9 @@ export class CcMap extends withResizeObserver(LitElement) {
 
     return html`
       <div id="cc-map-container" class=${classMap({ 'no-data': noHeatmapPoints })}></div>
-      <div class="legend ${classMap({ 'no-data': noHeatmapPoints })}"><slot></slot></div>
+      <div class="legend ${classMap({ 'no-data': noHeatmapPoints })}">
+        <slot></slot>
+      </div>
       ${this.loading && !this.error ? html`
         <cc-loader class="loader"></cc-loader>
       ` : ''}
@@ -359,99 +338,99 @@ export class CcMap extends withResizeObserver(LitElement) {
       leafletStyles,
       // language=CSS
       css`
-        :host {
-          display: flex;
-          flex-direction: column;
-          height: 15rem;
-          position: relative;
-          width: 20rem;
-        }
+          :host {
+              display: flex;
+              flex-direction: column;
+              height: 15rem;
+              position: relative;
+              width: 20rem;
+          }
 
-        #cc-map-container {
-          flex: 1 1 0;
-          width: 100%;
-        }
+          #cc-map-container {
+              flex: 1 1 0;
+              width: 100%;
+          }
 
-        :host([loading]) .leaflet-control-container,
-        :host([error]) .leaflet-control-container {
-          display: none;
-        }
+          :host([loading]) .leaflet-control-container,
+          :host([error]) .leaflet-control-container {
+              display: none;
+          }
 
-        :host([loading]) #cc-map-container,
-        :host([error]) #cc-map-container,
-        #cc-map-container.no-data,
-        :host([loading]) .legend,
-        :host([error]) .legend,
-        .legend.no-data {
-          filter: blur(.1rem);
-        }
+          :host([loading]) #cc-map-container,
+          :host([error]) #cc-map-container,
+          #cc-map-container.no-data,
+          :host([loading]) .legend,
+          :host([error]) .legend,
+          .legend.no-data {
+              filter: blur(.1rem);
+          }
 
-        .leaflet-container {
-          background-color: #aadaff;
-          z-index: 1;
-        }
+          .leaflet-container {
+              background-color: #aadaff;
+              z-index: 1;
+          }
 
-        .map-country {
-          fill: #f5f5f5;
-          fill-opacity: 1;
-          stroke: #ddd;
-          stroke-width: 1;
-        }
+          .map-country {
+              fill: #f5f5f5;
+              fill-opacity: 1;
+              stroke: #ddd;
+              stroke-width: 1;
+          }
 
-        :host(:not(:empty)) .legend {
-          background-color: #f1f5ff;
-          box-shadow: inset 0 6px 6px -6px #a4b1c9;
-          box-sizing: border-box;
-          color: #2e2e2e;
-          font-size: 0.9rem;
-          font-style: italic;
-          padding: 0.4rem 1rem;
-        }
+          :host(:not(:empty)) .legend {
+              background-color: #f1f5ff;
+              box-shadow: inset 0 6px 6px -6px #a4b1c9;
+              box-sizing: border-box;
+              color: #2e2e2e;
+              font-size: 0.9rem;
+              font-style: italic;
+              padding: 0.4rem 1rem;
+          }
 
-        .loader {
-          height: 100%;
-          left: 0;
-          position: absolute;
-          top: 0;
-          width: 100%;
-          /* Over Leaflet */
-          z-index: 2000;
-        }
+          .loader {
+              height: 100%;
+              left: 0;
+              position: absolute;
+              top: 0;
+              width: 100%;
+              /* Over Leaflet */
+              z-index: 2000;
+          }
 
-        .msg-container {
-          align-items: center;
-          display: flex;
-          height: 100%;
-          justify-content: center;
-          left: 0;
-          position: absolute;
-          top: 0;
-          width: 100%;
-          /* Over Leaflet */
-          z-index: 2000;
-        }
+          .msg-container {
+              align-items: center;
+              display: flex;
+              height: 100%;
+              justify-content: center;
+              left: 0;
+              position: absolute;
+              top: 0;
+              width: 100%;
+              /* Over Leaflet */
+              z-index: 2000;
+          }
 
-        cc-error,
-        .msg {
-          max-width: 80%;
-        }
+          cc-error,
+          .msg {
+              max-width: 80%;
+          }
 
-        .msg {
-          align-items: center;
-          background-color: white;
-          border: 1px solid #bcc2d1;
-          border-radius: 0.25rem;
-          box-shadow: 0 0 1rem #aaa;
-          display: flex;
-          justify-content: center;
-          padding: 1rem;
-        }
+          .msg {
+              align-items: center;
+              background-color: white;
+              border: 1px solid #bcc2d1;
+              border-radius: 0.25rem;
+              box-shadow: 0 0 1rem #aaa;
+              display: flex;
+              justify-content: center;
+              padding: 1rem;
+          }
 
-        .cc-map-marker {
-          align-items: center;
-          display: flex;
-          justify-content: center;
-        }
+          .cc-map-marker {
+              align-items: center;
+              display: flex;
+              justify-content: center;
+          }
       `,
     ];
   }
