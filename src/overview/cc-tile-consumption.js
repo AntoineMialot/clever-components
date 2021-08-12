@@ -11,25 +11,18 @@ const SKELETON_CONSUMPTION = {
 };
 
 /**
+ * @typedef {import('./types.js').Consumption} Consumption
+ */
+
+/**
  * A "tile" component to display consumption info (yesterday and over last 30 days).
  *
  * ## Details
  *
  * * When `consumption` is nullish, a skeleton screen UI pattern is displayed (loading hint).
  *
- * ## Type definitions
- *
- * ```js
- * interface Consumption {
- *   yesterday: number,
- *   last30Days: number,
- * }
- * ```
  *
  * @cssdisplay grid
- *
- * @prop {Consumption} consumption - Sets the consumption details.
- * @prop {Boolean} error - Displays an error message.
  */
 export class CcTileConsumption extends LitElement {
 
@@ -42,6 +35,11 @@ export class CcTileConsumption extends LitElement {
 
   constructor () {
     super();
+
+    /** @type {Consumption} Sets the consumption details */
+    this.consumption = null;
+
+    /** @type {Boolean} Displays an error message */
     this.error = false;
   }
 
@@ -52,9 +50,9 @@ export class CcTileConsumption extends LitElement {
 
     return html`
       <div class="tile_title">${i18n('cc-tile-consumption.title')}</div>
-      
+
       ${!this.error ? html`
-        <div class="tile_body">      
+        <div class="tile_body">
           <div class="line">
             <span>${i18n('cc-tile-consumption.yesterday')}</span>
             <span class="separator"></span>
@@ -67,10 +65,10 @@ export class CcTileConsumption extends LitElement {
           </div>
         </div>
       ` : ''}
-      
+
       ${this.error ? html`
         <cc-error class="tile_message">${i18n('cc-tile-consumption.error')}</cc-error>
-      ` : ''} 
+      ` : ''}
     `;
   }
 
@@ -80,26 +78,26 @@ export class CcTileConsumption extends LitElement {
       skeletonStyles,
       // language=CSS
       css`
-        .line {
-          align-items: center;
-          display: flex;
-          padding: 0.5rem 0;
-          width: 100%;
-        }
+          .line {
+              align-items: center;
+              display: flex;
+              padding: 0.5rem 0;
+              width: 100%;
+          }
 
-        .separator {
-          border-top: 1px dotted #8C8C8C;
-          flex: 1 1 0;
-          margin: 0 10px;
-        }
+          .separator {
+              border-top: 1px dotted #8C8C8C;
+              flex: 1 1 0;
+              margin: 0 10px;
+          }
 
-        .value {
-          font-weight: bold;
-        }
+          .value {
+              font-weight: bold;
+          }
 
-        .skeleton {
-          background-color: #bbb;
-        }
+          .skeleton {
+              background-color: #bbb;
+          }
       `,
     ];
   }

@@ -13,27 +13,17 @@ const SKELETON_DEPLOYS = [
 ];
 
 /**
+ * @typedef {import('./types.js').Deployment} Deployment
+ */
+
+/**
  * A "tile" component to display a list of deployments (status, humanized time ago and logs link).
  *
  * ## Details
  *
  * * When `deployments` is nullish, a skeleton screen UI pattern is displayed (loading hint)
  *
- * ## Type definitions
- *
- * ```js
- * interface Deployment {
- *   state: string,
- *   action: string,
- *   date: string,
- *   logsUrl: string,
- * }
- * ```
- *
  * @cssdisplay grid
- *
- * @prop {Deployment[]} deployments - Sets the list of the last deployments (it's up to you to only pass 2 or 3).
- * @prop {Boolean} error - Displays an error message.
  */
 export class CcTileDeployments extends LitElement {
 
@@ -46,6 +36,11 @@ export class CcTileDeployments extends LitElement {
 
   constructor () {
     super();
+
+    /** @type {Deployment[]} Sets the list of the last deployments (it's up to you to only pass 2 or 3) */
+    this.deployments = null;
+
+    /** @type {Boolean} Displays an error message */
     this.error = false;
   }
 
@@ -73,7 +68,7 @@ export class CcTileDeployments extends LitElement {
 
     return html`
       <div class="tile_title">${i18n('cc-tile-deployments.title')}</div>
-      
+
       ${hasData ? html`
         <div class="tile_body">
           <!-- We don't really need to repeat and key by -->
@@ -95,7 +90,7 @@ export class CcTileDeployments extends LitElement {
           `)}
         </div>
       ` : ''}
-        
+
       ${emptyData ? html`
         <div class="tile_message">${i18n('cc-tile-deployments.empty')}</div>
       ` : ''}
@@ -113,37 +108,37 @@ export class CcTileDeployments extends LitElement {
       linkStyles,
       // language=CSS
       css`
-        .tile_body {
-          align-items: start;
-          grid-gap: 1rem;
-          grid-template-columns: auto auto auto;
-          justify-content: space-between;
-        }
+          .tile_body {
+              align-items: start;
+              grid-gap: 1rem;
+              grid-template-columns: auto auto auto;
+              justify-content: space-between;
+          }
 
-        .state {
-          color: #fff;
-          font-weight: bold;
-        }
+          .state {
+              color: #fff;
+              font-weight: bold;
+          }
 
-        .state[data-state="CANCELLED"] {
-          color: #b06d0f;
-        }
+          .state[data-state="CANCELLED"] {
+              color: #b06d0f;
+          }
 
-        .state[data-state="FAIL"] {
-          color: #cc0028;
-        }
+          .state[data-state="FAIL"] {
+              color: #cc0028;
+          }
 
-        .state[data-state="OK"] {
-          color: #2faa60;
-        }
+          .state[data-state="OK"] {
+              color: #2faa60;
+          }
 
-        [title] {
-          cursor: help;
-        }
+          [title] {
+              cursor: help;
+          }
 
-        .skeleton {
-          background-color: #bbb;
-        }
+          .skeleton {
+              background-color: #bbb;
+          }
       `,
     ];
   }

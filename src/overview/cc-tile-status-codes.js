@@ -37,6 +37,7 @@ const SKELETON_STATUS_CODES = { 200: 1 };
  * * When `data` is nullish, a skeleton screen UI pattern is displayed (loading hint).
  * * A short doc is available when the (i) button is clicked.
  *
+ * //TODO: how do we deal with the example?
  * ## Type definitions
  *
  * ```js

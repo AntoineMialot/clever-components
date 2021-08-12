@@ -30,6 +30,8 @@ const SKELETON_REQUESTS = Array
  *   * 8 bars of 3 hours
  *   * 12 bars of 2 hours
  *
+ *
+ * TODO: check overview/types.d.ts to check the interface
  * ## Type definitions
  *
  * An array of 3 values:
@@ -44,8 +46,6 @@ const SKELETON_REQUESTS = Array
  *
  * @cssdisplay grid
  *
- * @prop {RequestsData[24]} data - Sets the list of 24 time windows of one hour with timestamps and number of requests.
- * @prop {Boolean} error - Displays an error message.
  */
 export class CcTileRequests extends withResizeObserver(LitElement) {
 
@@ -62,10 +62,18 @@ export class CcTileRequests extends withResizeObserver(LitElement) {
 
   constructor () {
     super();
-    this.error = 0;
+
+    /** @type {RequestsData[24]} Sets the list of 24 time windows of one hour with timestamps and number of requests */
+    this.data = null;
+
+    /** @type {Boolean} Displays an error message */
+    this.error = false;
+
     // Default to lower resolution
     this._barCount = 6;
+
     this._data = null;
+
     this._docs = false;
   }
 

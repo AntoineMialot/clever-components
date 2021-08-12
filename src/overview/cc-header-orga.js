@@ -15,27 +15,17 @@ const SKELETON_ORGA = {
 };
 
 /**
+ * @typedef {import('../types.js').Orga} Orga
+ */
+
+/**
  * A component to display various info about an orga (name and enterprise status).
  *
  * ## Details
-
+ *
  * * When `orga` is nullish, a skeleton screen UI pattern is displayed (loading hint)
  *
- * ## Type definitions
- *
- * ```js
- * interface Orga {
- *   name: string,
- *   avatar: string,
- *   cleverEnterprise: boolean,
- *   emergencyNumber: string,
- * }
- * ```
- *
  * @cssdisplay block
- *
- * @prop {Boolean} error - Displays an error message.
- * @prop {Orga} orga - Sets organization details and config.
  */
 export class CcHeaderOrga extends LitElement {
 
@@ -48,7 +38,12 @@ export class CcHeaderOrga extends LitElement {
 
   constructor () {
     super();
+
+    /** @type {Boolean} Displays an error message */
     this.error = false;
+
+    /** @type {Orga} Sets organization details and config */
+    this.orga = null;
   }
 
   render () {
@@ -63,11 +58,11 @@ export class CcHeaderOrga extends LitElement {
 
     return html`
       <cc-flex-gap class="wrapper ${classMap({ enterprise: orga.cleverEnterprise })}">
-      
+
         ${this.error ? html`
           <cc-error>${i18n('cc-header-orga.error')}</cc-error>
         ` : ''}
-        
+
         ${!this.error ? html`
           <cc-img class="logo" ?skeleton=${skeleton} src=${ifDefined(orga.avatar)} text=${initials}></cc-img>
           <div class="details">
@@ -98,108 +93,108 @@ export class CcHeaderOrga extends LitElement {
       skeletonStyles,
       // language=CSS
       css`
-        :host {
-          --cc-gap: 1rem;
-          display: block;
-        }
+          :host {
+              --cc-gap: 1rem;
+              display: block;
+          }
 
-        .wrapper {
-          background-color: #fff;
-          border: 1px solid #bcc2d1;
-          border-radius: 0.25rem;
-          display: block;
-          overflow: hidden;
-          padding: var(--cc-gap);
-        }
+          .wrapper {
+              background-color: #fff;
+              border: 1px solid #bcc2d1;
+              border-radius: 0.25rem;
+              display: block;
+              overflow: hidden;
+              padding: var(--cc-gap);
+          }
 
-        .wrapper.enterprise {
-          border-color: #1ea2f1;
-          border-width: 2px;
-        }
+          .wrapper.enterprise {
+              border-color: #1ea2f1;
+              border-width: 2px;
+          }
 
-        .logo {
-          border-radius: 0.25rem;
-          height: 3.25rem;
-          width: 3.25rem;
-        }
+          .logo {
+              border-radius: 0.25rem;
+              height: 3.25rem;
+              width: 3.25rem;
+          }
 
-        .details,
-        .hotline {
-          align-items: flex-start;
-          display: flex;
-          flex-direction: column;
-        }
+          .details,
+          .hotline {
+              align-items: flex-start;
+              display: flex;
+              flex-direction: column;
+          }
 
-        .details {
-          justify-content: center;
-        }
+          .details {
+              justify-content: center;
+          }
 
-        .hotline {
-          justify-content: space-between;
-        }
+          .hotline {
+              justify-content: space-between;
+          }
 
-        .name {
-          font-size: 1.1rem;
-          font-weight: bold;
-          min-width: 12rem;
-        }
+          .name {
+              font-size: 1.1rem;
+              font-weight: bold;
+              min-width: 12rem;
+          }
 
-        .badge,
-        .hotline_number {
-          align-items: center;
-          border-radius: 0.15rem;
-          display: flex;
-          font-size: 0.8rem;
-          font-weight: bold;
-          padding: 0.2rem 0.4rem;
-        }
+          .badge,
+          .hotline_number {
+              align-items: center;
+              border-radius: 0.15rem;
+              display: flex;
+              font-size: 0.8rem;
+              font-weight: bold;
+              padding: 0.2rem 0.4rem;
+          }
 
-        .badge {
-          background: #1ea2f1;
-          color: #fff;
-        }
+          .badge {
+              background: #1ea2f1;
+              color: #fff;
+          }
 
-        .hotline_number {
-          border: 1px solid #1ea2f1;
-          color: #1ea2f1;
-          cursor: pointer;
-        }
+          .hotline_number {
+              border: 1px solid #1ea2f1;
+              color: #1ea2f1;
+              cursor: pointer;
+          }
 
-        .badge_img,
-        .hotline_number_img {
-          height: 0.9rem;
-          margin-right: 0.4rem;
-          overflow: hidden;
-          width: 0.9rem;
-        }
+          .badge_img,
+          .hotline_number_img {
+              height: 0.9rem;
+              margin-right: 0.4rem;
+              overflow: hidden;
+              width: 0.9rem;
+          }
 
-        .hotline_number:focus {
-          box-shadow: 0 0 0 .2em rgba(50, 115, 220, .25);
-          outline: 0;
-        }
+          .hotline_number:focus {
+              box-shadow: 0 0 0 .2em rgba(50, 115, 220, .25);
+              outline: 0;
+          }
 
-        .hotline_number:hover {
-          box-shadow: 0 1px 3px #888;
-        }
+          .hotline_number:hover {
+              box-shadow: 0 1px 3px #888;
+          }
 
-        .hotline_number:active {
-          box-shadow: none;
-          outline: 0;
-        }
+          .hotline_number:active {
+              box-shadow: none;
+              outline: 0;
+          }
 
-        /* We can do this because we set a visible focus state */
-        .hotline_number::-moz-focus-inner {
-          border: 0;
-        }
+          /* We can do this because we set a visible focus state */
+          .hotline_number::-moz-focus-inner {
+              border: 0;
+          }
 
-        .spacer {
-          flex: 1 1 0;
-        }
+          .spacer {
+              flex: 1 1 0;
+          }
 
-        /* SKELETON */
-        .skeleton {
-          background-color: #bbb;
-        }
+          /* SKELETON */
+          .skeleton {
+              background-color: #bbb;
+          }
       `,
     ];
   }

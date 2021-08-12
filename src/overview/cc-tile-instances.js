@@ -22,27 +22,15 @@ const SKELETON_INSTANCES = {
 };
 
 /**
+ * @typedef {import('./types.js').InstancesState} InstancesState
+ */
+
+/**
  * A "tile" component to display current status of running and deploying instances for a given app.
  *
  * ## Details
  *
  * * When `instances` is nullish, a loader is displayed.
- *
- * ## Type definitions
- *
- * ```js
- * interface InstancesState {
- *   running: Instance[],
- *   deploying: Instance[],
- * }
- * ```
- *
- * ```js
- * interface Instance {
- *   flavourName: string,
- *   count: number,
- * }
- * ```
  *
  * @cssdisplay grid
  *
@@ -60,7 +48,12 @@ export class CcTileInstances extends LitElement {
 
   constructor () {
     super();
+
+    /** @type {Boolean} Displays an error message */
     this.error = false;
+
+    /** @type {InstancesState} Sets the current state of running and deploying instances */
+    this.instances = null;
   }
 
   _getStatusLabel (type) {
@@ -114,21 +107,21 @@ export class CcTileInstances extends LitElement {
 
     return html`
       <div class="tile_title">${i18n('cc-tile-instances.title')}</div>
-      
+
       ${!this.error && !emptyData ? html`
         <div class="tile_body">
           <cc-expand>
             ${this._renderInstances(instances.running, 'running')}
             ${this._renderInstances(instances.deploying, 'deploying')}
           </cc-expand>
-          
+
           <!-- in this case, a loader is better than a skeleton screen since we're not so sure about the future state -->
           ${isLoading ? html`
-      <cc-loader></cc-loader>
-    ` : ''}
+            <cc-loader></cc-loader>
+          ` : ''}
         </div>
       ` : ''}
-      
+
       ${emptyData ? html`
         <div class="tile_message">${i18n('cc-tile-instances.empty')}</div>
       ` : ''}
@@ -146,47 +139,47 @@ export class CcTileInstances extends LitElement {
       waitingStyles,
       // language=CSS
       css`
-        cc-expand {
-          width: 100%;
-        }
+          cc-expand {
+              width: 100%;
+          }
 
-        .instances {
-          align-items: center;
-          display: flex;
-          width: 100%;
-        }
+          .instances {
+              align-items: center;
+              display: flex;
+              width: 100%;
+          }
 
-        .instances[data-type=running] {
-          --status-color: #2faa60;
-        }
+          .instances[data-type=running] {
+              --status-color: #2faa60;
+          }
 
-        .instances[data-type=deploying] {
-          --status-color: #2b96fd;
-        }
+          .instances[data-type=deploying] {
+              --status-color: #2b96fd;
+          }
 
-        .instances_status-img {
-          height: 1.75rem;
-          width: 1.75rem;
-        }
+          .instances_status-img {
+              height: 1.75rem;
+              width: 1.75rem;
+          }
 
-        .instances_status {
-          color: var(--status-color);
-          flex: 1 1 0;
-          font-size: 1.2rem;
-          margin-left: 0.25rem;
-        }
+          .instances_status {
+              color: var(--status-color);
+              flex: 1 1 0;
+              font-size: 1.2rem;
+              margin-left: 0.25rem;
+          }
 
-        .size-label {
-          margin: var(--bubble-r);
-          position: relative;
-        }
+          .size-label {
+              margin: var(--bubble-r);
+              position: relative;
+          }
 
-        .count-bubble {
-          background-color: var(--status-color);
-          bottom: calc(var(--bubble-d) / -2);
-          position: absolute;
-          right: calc(var(--bubble-d) / -2);
-        }
+          .count-bubble {
+              background-color: var(--status-color);
+              bottom: calc(var(--bubble-d) / -2);
+              position: absolute;
+              right: calc(var(--bubble-d) / -2);
+          }
       `,
     ];
   }

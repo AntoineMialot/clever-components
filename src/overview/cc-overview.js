@@ -16,8 +16,6 @@ import { withResizeObserver } from '../mixins/with-resize-observer.js';
  *
  * @cssdisplay grid
  *
- * @prop {"app"|"orga"} mode - Sets the mode of the layout for the overview.
- *
  * @slot - Put your `.head`, tiles and `.main` components here.
  *
  * @cssprop {Number} --cc-overview-head-count - How many `.head` elements marked are in the slot  (defaults: `1`).
@@ -33,6 +31,10 @@ export class CcOverview extends withResizeObserver(LitElement) {
 
   constructor () {
     super();
+
+    /** @type {"app"|"orga"} Sets the mode of the layout for the overview */
+    this.mode = null;
+
     /** @protected */
     this.breakpoints = {
       // ceiled width with 275px tiles and 1rem (16px) gap
@@ -49,73 +51,73 @@ export class CcOverview extends withResizeObserver(LitElement) {
   static get styles () {
     // language=CSS
     return css`
-      :host {
-        /* We ask the user to specify this number (if > 1) because the information is known and detecting it automatically and properly requires a MutationObserver to count them in the \`<slot>\` and it seems overkill. */
-        --cc-overview-head-count: 1;
-        display: grid;
-        grid-gap: 1rem;
-      }
+        :host {
+            /* We ask the user to specify this number (if > 1) because the information is known and detecting it automatically and properly requires a MutationObserver to count them in the \`<slot>\` and it seems overkill. */
+            --cc-overview-head-count: 1;
+            display: grid;
+            grid-gap: 1rem;
+        }
 
-      /* GRID LAYOUT */
-      :host([w-lt-570]) {
-        grid-template-columns: [main-start] 1fr [main-end];
-      }
+        /* GRID LAYOUT */
+        :host([w-lt-570]) {
+            grid-template-columns: [main-start] 1fr [main-end];
+        }
 
-      :host([w-gte-570][w-lt-860]) {
-        grid-template-columns: [main-start] 1fr 1fr [main-end];
-      }
+        :host([w-gte-570][w-lt-860]) {
+            grid-template-columns: [main-start] 1fr 1fr [main-end];
+        }
 
-      :host([w-gte-860][w-lt-1150]) {
-        grid-template-columns: [main-start] 1fr 1fr [main-end] 1fr;
-      }
+        :host([w-gte-860][w-lt-1150]) {
+            grid-template-columns: [main-start] 1fr 1fr [main-end] 1fr;
+        }
 
-      :host([w-gte-1150]) {
-        grid-template-columns: [main-start] 1fr 1fr 1fr [main-end] 1fr;
-      }
+        :host([w-gte-1150]) {
+            grid-template-columns: [main-start] 1fr 1fr 1fr [main-end] 1fr;
+        }
 
-      /* GRID LAYOUT (app) */
-      :host([mode="app"][w-lt-570]) {
-        grid-template-rows: repeat(calc(var(--cc-overview-head-count) + 6), min-content) [main-start] 1fr [main-end];
-      }
+        /* GRID LAYOUT (app) */
+        :host([mode="app"][w-lt-570]) {
+            grid-template-rows: repeat(calc(var(--cc-overview-head-count) + 6), min-content) [main-start] 1fr [main-end];
+        }
 
-      :host([mode="app"][w-gte-570][w-lt-860]) {
-        grid-template-rows: repeat(calc(var(--cc-overview-head-count) + 3), min-content) [main-start] 1fr [main-end];
-      }
+        :host([mode="app"][w-gte-570][w-lt-860]) {
+            grid-template-rows: repeat(calc(var(--cc-overview-head-count) + 3), min-content) [main-start] 1fr [main-end];
+        }
 
-      :host([mode="app"][w-gte-860][w-lt-1150]) {
-        grid-template-rows: repeat(calc(var(--cc-overview-head-count) + 1), min-content) [main-start] min-content 1fr 1fr [main-end];
-      }
+        :host([mode="app"][w-gte-860][w-lt-1150]) {
+            grid-template-rows: repeat(calc(var(--cc-overview-head-count) + 1), min-content) [main-start] min-content 1fr 1fr [main-end];
+        }
 
-      :host([mode="app"][w-gte-1150]) {
-        grid-template-rows: repeat(calc(var(--cc-overview-head-count) + 1), min-content) [main-start] 1fr 1fr [main-end];
-      }
+        :host([mode="app"][w-gte-1150]) {
+            grid-template-rows: repeat(calc(var(--cc-overview-head-count) + 1), min-content) [main-start] 1fr 1fr [main-end];
+        }
 
-      /* GRID LAYOUT (orga) */
-      :host([mode="orga"][w-lt-570]) {
-        grid-template-rows: repeat(calc(var(--cc-overview-head-count) + 2), min-content) [main-start] 1fr [main-end];
-      }
+        /* GRID LAYOUT (orga) */
+        :host([mode="orga"][w-lt-570]) {
+            grid-template-rows: repeat(calc(var(--cc-overview-head-count) + 2), min-content) [main-start] 1fr [main-end];
+        }
 
-      :host([mode="orga"][w-gte-570][w-lt-860]) {
-        grid-template-rows: repeat(calc(var(--cc-overview-head-count) + 1), min-content) [main-start] 1fr [main-end];
-      }
+        :host([mode="orga"][w-gte-570][w-lt-860]) {
+            grid-template-rows: repeat(calc(var(--cc-overview-head-count) + 1), min-content) [main-start] 1fr [main-end];
+        }
 
-      :host([mode="orga"][w-gte-860]) {
-        grid-template-rows: repeat(calc(var(--cc-overview-head-count) + 0), min-content) [main-start] 1fr 1fr [main-end];
-      }
+        :host([mode="orga"][w-gte-860]) {
+            grid-template-rows: repeat(calc(var(--cc-overview-head-count) + 0), min-content) [main-start] 1fr 1fr [main-end];
+        }
 
-      /* .head TILE POSITION/SIZE */
-      ::slotted(*.head) {
-        grid-column: 1 / -1;
-      }
+        /* .head TILE POSITION/SIZE */
+        ::slotted(*.head) {
+            grid-column: 1 / -1;
+        }
 
-      /* .main TILE POSITION/SIZE */
-      ::slotted(*.main) {
-        grid-column: main-start / main-end;
-        grid-row: main-start / main-end;
-        height: auto;
-        min-height: 25rem;
-        width: auto;
-      }
+        /* .main TILE POSITION/SIZE */
+        ::slotted(*.main) {
+            grid-column: main-start / main-end;
+            grid-row: main-start / main-end;
+            height: auto;
+            min-height: 25rem;
+            width: auto;
+        }
     `;
   }
 }

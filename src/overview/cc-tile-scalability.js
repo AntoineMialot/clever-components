@@ -14,32 +14,15 @@ const SKELETON_SCALABILITY = {
 };
 
 /**
+ * @typedef {import('./types.js').Scalability} Scalability
+ */
+
+/**
  * A "tile" component to display the current config of scalability for a given app.
  *
  * ## Details
-
+ *
  * * When `scalability` is nullish, a skeleton screen UI pattern is displayed (loading hint).
- *
- * ## Type definitions
- *
- * ```js
- * interface Flavor {
- *   name: string,
- *   cpus: number,
- *   gpus: number,
- *   mem: number,
- *   microservice: boolean,
- * }
- * ```
- *
- * ```js
- * interface Scalability {
- *   minFlavor: Flavor,
- *   maxFlavor: Flavor,
- *   minInstances: number,
- *   maxInstances: number,
- * }
- * ```
  *
  * @cssdisplay grid
  *
@@ -53,6 +36,16 @@ export class CcTileScalability extends LitElement {
       error: { type: Boolean, reflect: true },
       scalability: { type: Object },
     };
+  }
+
+  constructor () {
+    super();
+
+    /** @type {Boolean} Displays an error message */
+    this.error = false;
+
+    /** @type {Scalability} Sets the scalability config of an app with details about flavors and number of instances */
+    this.scalability = null;
   }
 
   _getFlavorDetails (flavor) {
@@ -74,18 +67,20 @@ export class CcTileScalability extends LitElement {
 
     return html`
       <div class="tile_title">${i18n('cc-tile-scalability.title')}</div>
-      
+
       ${!this.error ? html`
         <div class="tile_body">
           <div class="label">${i18n('cc-tile-scalability.size')}</div>
           <div class="info">
             <div class="size-label ${classMap({ skeleton })}"
               title=${ifDefined(this._getFlavorDetails(minFlavor))}
-            >${this._formatFlavorName(minFlavor.name)}</div>
+            >${this._formatFlavorName(minFlavor.name)}
+            </div>
             <div class="separator"></div>
             <div class="size-label ${classMap({ skeleton })}"
               title=${ifDefined(this._getFlavorDetails(maxFlavor))}
-            >${this._formatFlavorName(maxFlavor.name)}</div>
+            >${this._formatFlavorName(maxFlavor.name)}
+            </div>
           </div>
           <div class="label">${i18n('cc-tile-scalability.number')}</div>
           <div class="info">
@@ -109,29 +104,29 @@ export class CcTileScalability extends LitElement {
       skeletonStyles,
       // language=CSS
       css`
-        .tile_body {
-          align-items: center;
-          grid-column-gap: 2rem;
-          grid-row-gap: 1rem;
-          grid-template-columns: auto 1fr;
-        }
+          .tile_body {
+              align-items: center;
+              grid-column-gap: 2rem;
+              grid-row-gap: 1rem;
+              grid-template-columns: auto 1fr;
+          }
 
-        .info {
-          align-items: center;
-          display: flex;
-          justify-content: center;
-          width: 100%;
-        }
+          .info {
+              align-items: center;
+              display: flex;
+              justify-content: center;
+              width: 100%;
+          }
 
-        .separator {
-          border-top: 1px dashed #8C8C8C;
-          flex: 1 1 0;
-          width: 1.5rem;
-        }
+          .separator {
+              border-top: 1px dashed #8C8C8C;
+              flex: 1 1 0;
+              width: 1.5rem;
+          }
 
-        [title] {
-          cursor: help;
-        }
+          [title] {
+              cursor: help;
+          }
       `,
     ];
   }
