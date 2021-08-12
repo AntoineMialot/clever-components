@@ -4,38 +4,19 @@ import './cc-pricing-product.js';
 import './cc-pricing-estimation.js';
 import { dispatchCustomEvent } from '../lib/events.js';
 
+/** @type {Currency} */
 const CURRENCY_EUR = { code: 'EUR', changeRate: '1' };
+
+/**
+ * @typedef {import('./types.js').Currency} Currency
+ * @typedef {import('./types.js').Plan} Plan
+ * @typedef {import('../types.js').Zone} Zone
+ */
 
 /**
  * A component to display a pricing simulator with a list of `<cc-pricing-product>` in the default slot.
  *
- * ## Type definitions
- *
- * ```js
- * interface Currency {
- *   name: string,
- *   code: string,
- * }
- *
- * ```js
- * interface Zone {
- *   name: string,          // Unique code/identifier for the zone
- *   lat: number,           // Latitude
- *   lon: number,           // Longitude
- *   countryCode: string,   // ISO 3166-1 alpha-2 code of the country (2 letters): "FR", "CA", "US"...
- *   city: string,          // Name of the city in english: "Paris", "Montreal", "New York City"...
- *   country: string,       // Name of the country in english: "France", "Canada", "United States"...
- *   displayName?: string,  // Optional display name for private zones (instead of displaying city + country): "ACME (dedicated)"...
- *   tags: string[],        // Array of strings for semantic tags: ["region:eu", "infra:clever-cloud"], ["scope:private"]...
- * }
- * ```
- *
  * @cssdisplay block
- *
- * @prop {Currency[]} currencies - Sets the list of currencies available for selection.
- * @prop {Currency} currency - Sets the current selected currency.
- * @prop {String} zoneId - Sets the current selected zone by its ID/name.
- * @prop {Zone[]} zones - Sets the list of zones available for selection.
  *
  * @event {CustomEvent<Currency>} cc-pricing-page:change-currency - Fires the `currency` whenever the currency selection changes.
  * @event {CustomEvent<String>} cc-pricing-page:change-zone - Fires the `zoneId` (zone name) whenever the zone selection changes.
@@ -62,7 +43,19 @@ export class CcPricingPage extends LitElement {
 
   constructor () {
     super();
+
+    /** @type {Currency[]} Sets the list of currencies available for selection */
+    this.currencies = null;
+
+    /** @type {Currency} Sets the current selected currency */
     this.currency = CURRENCY_EUR;
+
+    /** @type {String} Sets the current selected zone by its ID/name */
+    this.zoneId = null;
+
+    /** @type {Zone[]} Sets the list of zones available for selection */
+    this.zones = null;
+
     this._selectedPlans = {};
   }
 
@@ -129,7 +122,7 @@ export class CcPricingPage extends LitElement {
       <slot @cc-pricing-product:add-plan=${this._onAddPlan}></slot>
 
       <slot name="estimation-header"></slot>
-      
+
       <cc-pricing-estimation
         exportparts="selected-plans: estimation-selected-plans, recap: estimation-recap"
         .currency=${this.currency}
@@ -145,9 +138,9 @@ export class CcPricingPage extends LitElement {
     return [
       // language=CSS
       css`
-        :host {
-          display: contents;
-        }
+          :host {
+              display: contents;
+          }
       `,
     ];
   }

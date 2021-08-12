@@ -28,6 +28,12 @@ const AVAILABLE_FEATURES = Object.keys(FEATURES_I18N);
 const NUMBER_FEATURE_TYPES = ['bytes', 'number', 'number-cpu-runtime'];
 
 /**
+ * @typedef {import('./types.js').Currency} Currency
+ * @typedef {import('./types.js').Feature} Feature
+ * @typedef {import('./types.js').Plan} Plan
+ */
+
+/**
  * A component to display product plans and their features.
  *
  * ## Details
@@ -36,38 +42,7 @@ const NUMBER_FEATURE_TYPES = ['bytes', 'number', 'number-cpu-runtime'];
  * * If a plan has a feature that is not listed in `features`, it will be ignored.
  * * If a feature has a `code` that is not supported, it will be ignored.
  *
- * ## Type definitions
- *
- * ```js
- * interface Plan {
- *   productName: string,
- *   name: string,
- *   price: number, // price in euros for 1 hour
- *   features: Feature[],
- * }
- * ```
- *
- * ```js
- * interface Feature {
- *   code: "connection-limit" | "cpu" | "databases" | "disk-size" | "gpu" | "has-logs" | "has-metrics" | "max-db-size" | "memory" | "version",
- *   type: "boolean" | "shared" | "bytes" | "number" | "runtime" | "string",
- *   value?: number|string, // Only required for a plan feature
- * }
- * ```
- *
- * ```js
- * interface Currency {
- *   code: string,
- *   changeRate: number, // based on euros
- * }
- * ```
- *
  * @cssdisplay block
- *
- * @prop {"add"|"none"} action - Sets the type of action: "add" to display add buttons for each plan and "none" for no actions (defaults to "add").
- * @prop {Currency} currency - Sets the currency used to display the prices (defaults to euros).
- * @prop {Feature[]} features - Sets the list of features (used for the feature sort order).
- * @prop {Plan[]} plans - Sets the list of plans.
  *
  * @event {CustomEvent<Plan>} cc-pricing-table:add-plan - Fires the plan whenever a "plus" button is clicked.
  */
@@ -87,8 +62,21 @@ export class CcPricingTable extends withResizeObserver(LitElement) {
 
   constructor () {
     super();
+
+    /** @type {"add"|"none"} Sets the type of action: "add" to display add buttons for each plan and "none" for no actions (defaults to "add") */
     this.action = 'add';
+
+    /** @type {Currency} Sets the currency used to display the prices (defaults to euros) */
+    this.currency = null;
+
+    /** @type {Feature[]} Sets the list of features (used for the feature sort order) */
+    this.features = null;
+
+    /** @type {Plan[]} Sets the list of plans */
+    this.plans = null;
+
     this._plans = [];
+
     this._features = [];
   }
 
@@ -285,142 +273,142 @@ export class CcPricingTable extends withResizeObserver(LitElement) {
     return [
       // language=CSS
       css`
-        :host {
-          background-color: #fff;
-          display: block;
-        }
+          :host {
+              background-color: #fff;
+              display: block;
+          }
 
-        .number-align {
-          text-align: right;
-        }
+          .number-align {
+              text-align: right;
+          }
 
-        em[title] {
-          cursor: help;
-          font-style: normal;
-          position: relative;
-        }
+          em[title] {
+              cursor: help;
+              font-style: normal;
+              position: relative;
+          }
 
-        em[title] code {
-          color: blue;
-          font-family: monospace;
-          font-weight: bold;
-        }
+          em[title] code {
+              color: blue;
+              font-family: monospace;
+              font-weight: bold;
+          }
 
-        /* BIG SIZE */
+          /* BIG SIZE */
 
-        table {
-          border-collapse: collapse;
-          border-spacing: 0;
-          width: 100%;
-        }
+          table {
+              border-collapse: collapse;
+              border-spacing: 0;
+              width: 100%;
+          }
 
-        tr:nth-child(n+3) {
-          border-top: 1px solid #e5e5e5;
-        }
+          tr:nth-child(n+3) {
+              border-top: 1px solid #e5e5e5;
+          }
 
-        th {
-          background-color: #f6f6fb;
-          padding: 1em 0.5em;
-          text-align: left;
-        }
+          th {
+              background-color: #f6f6fb;
+              padding: 1em 0.5em;
+              text-align: left;
+          }
 
-        th.btn-col {
-          width: 2em;
-        }
+          th.btn-col {
+              width: 2em;
+          }
 
-        td {
-          padding: 0.5em 0.5em;
-          white-space: nowrap;
-        }
+          td {
+              padding: 0.5em 0.5em;
+              white-space: nowrap;
+          }
 
-        td.btn-col {
-          padding: 0.25em 0.5em;
-        }
+          td.btn-col {
+              padding: 0.25em 0.5em;
+          }
 
-        tr:hover td {
-          background-color: #f5f5f5;
-        }
+          tr:hover td {
+              background-color: #f5f5f5;
+          }
 
-        table em[title] code {
-          box-sizing: border-box;
-          left: 100%;
-          padding: 0 0.15em;
-          position: absolute;
-        }
+          table em[title] code {
+              box-sizing: border-box;
+              left: 100%;
+              padding: 0 0.15em;
+              position: absolute;
+          }
 
-        /* SMALL SIZE */
+          /* SMALL SIZE */
 
-        .plan {
-          align-items: center;
-          border-top: 1px solid #e5e5e5;
-          display: grid;
-          grid-template-columns: min-content [main-start] 1fr [main-end] min-content;
-          margin: 0;
-          padding: 1em;
-        }
+          .plan {
+              align-items: center;
+              border-top: 1px solid #e5e5e5;
+              display: grid;
+              grid-template-columns: min-content [main-start] 1fr [main-end] min-content;
+              margin: 0;
+              padding: 1em;
+          }
 
-        :host([action="none"]) .plan {
-          grid-template-columns: [main-start] 1fr [main-end] min-content;
-        }
+          :host([action="none"]) .plan {
+              grid-template-columns: [main-start] 1fr [main-end] min-content;
+          }
 
-        .plan .add-plan-btn {
-          margin-right: 1em;
-        }
+          .plan .add-plan-btn {
+              margin-right: 1em;
+          }
 
-        .plan-name {
-          font-size: 1.2em;
-          font-weight: bold;
-        }
+          .plan-name {
+              font-size: 1.2em;
+              font-weight: bold;
+          }
 
-        .feature-list {
-          grid-column: main-start / main-end;
-        }
+          .feature-list {
+              grid-column: main-start / main-end;
+          }
 
-        .feature-list:not(:last-child) {
-          margin-top: 1em;
-        }
+          .feature-list:not(:last-child) {
+              margin-top: 1em;
+          }
 
-        .plan[data-state="closed"] .feature-list {
-          display: flex;
-          flex-wrap: wrap;
-        }
+          .plan[data-state="closed"] .feature-list {
+              display: flex;
+              flex-wrap: wrap;
+          }
 
-        .feature {
-          border-bottom: 1px solid #e5e5e5;
-          display: flex;
-          justify-content: space-between;
-          padding: 0.75em 0;
-        }
+          .feature {
+              border-bottom: 1px solid #e5e5e5;
+              display: flex;
+              justify-content: space-between;
+              padding: 0.75em 0;
+          }
 
-        .feature-list:last-child .feature:last-child {
-          border: none;
-        }
+          .feature-list:last-child .feature:last-child {
+              border: none;
+          }
 
-        .plan[data-state="closed"] .feature {
-          border: none;
-          line-height: 1.5;
-          padding: 0;
-          white-space: nowrap;
-        }
+          .plan[data-state="closed"] .feature {
+              border: none;
+              line-height: 1.5;
+              padding: 0;
+              white-space: nowrap;
+          }
 
-        .plan[data-state="closed"] .feature:not(:last-child)::after {
-          content: ',';
-          padding-right: 0.5em;
-        }
+          .plan[data-state="closed"] .feature:not(:last-child)::after {
+              content: ',';
+              padding-right: 0.5em;
+          }
 
-        .feature-name {
-          font-style: italic;
-          font-weight: bold;
-        }
+          .feature-name {
+              font-style: italic;
+              font-weight: bold;
+          }
 
-        .plan[data-state="closed"] .feature-name::after {
-          content: ' :';
-          padding-right: 0.25em;
-        }
+          .plan[data-state="closed"] .feature-name::after {
+              content: ' :';
+              padding-right: 0.25em;
+          }
 
-        .plan[data-state="opened"] .feature-value {
-          margin-right: 0.5em;
-        }
+          .plan[data-state="opened"] .feature-value {
+              margin-right: 0.5em;
+          }
       `,
     ];
   }

@@ -14,44 +14,15 @@ const SKELETON_NAME = '????????????';
 const SKELETON_DESCRIPTION = fakeString(180);
 
 /**
+ * @typedef {import('./types.js').Currency} Currency
+ * @typedef {import('./types.js').Feature} Feature
+ * @typedef {import('./types.js').Plan} Plan
+ */
+
+/**
  * A component to display product informations: icon, name, description with plans and their features.
  *
- * ## Type definitions
- *
- * ```js
- * interface Plan {
- *   productName: string,
- *   name: string,
- *   price: number, // price in euros for 1 hour
- *   features: Feature[],
- * }
- * ```
- *
- * ```js
- * interface Feature {
- *   code: "connection-limit" | "cpu" | "databases" | "disk-size" | "gpu" | "has-logs" | "has-metrics" | "max-db-size" | "memory" | "version",
- *   type: "boolean" | "shared" | "bytes" | "number" | "runtime" | "string",
- *   value?: number|string, // Only required for a plan feature
- * }
- * ```
- *
- * ```js
- * interface Currency {
- *   code: string,
- *   changeRate: number, // based on euros
- * }
- * ```
- *
  * @cssdisplay block
- *
- * @prop {"add"|"none"} action - Sets the type of action: "add" to display add buttons for each plan and "none" for no actions (defaults to "add").
- * @prop {Currency} currency - Sets the currency used to display the prices (defaults to euros).
- * @prop {String} description - Sets the description of the product (can be overriden with the default slot).
- * @prop {Boolean} error - Displays an error message.
- * @prop {Feature[]} features - Sets the list of features (used for the feature sort order).
- * @prop {String} icon - Sets the url of the product icon/logo image (can be overriden with the `icon` slot).
- * @prop {String} name - Sets the name of the product (can be overriden with the `name` slot).
- * @prop {Plan[]} plans - Sets the list of plans.
  *
  * @event {CustomEvent<Plan>} cc-pricing-product:add-plan - Fires the plan whenever a "plus" button is clicked.
  *
@@ -77,8 +48,30 @@ export class CcPricingProduct extends LitElement {
 
   constructor () {
     super();
+
+    /** @type {"add"|"none"} Sets the type of action: "add" to display add buttons for each plan and "none" for no actions (defaults to "add") */
     this.action = 'add';
+
+    /** @type {Currency} Sets the currency used to display the prices (defaults to euros) */
+    this.currency = null;
+
+    /** @type {String} Sets the description of the product (can be overriden with the default slot) */
+    this.description = null;
+
+    /** @type {Boolean} Displays an error message */
+    this.error = false;
+
+    /** @type {Feature[]} Sets the list of features (used for the feature sort order) */
     this.features = [];
+
+    /** @type {String} Sets the url of the product icon/logo image (can be overriden with the `icon` slot) */
+    this.icon = null;
+
+    /** @type {String} Sets the name of the product (can be overriden with the `name` slot) */
+    this.name = null;
+
+    /** @type {Plan[]} Sets the list of plans */
+    this.plans = null;
   }
 
   _onAddPlan ({ detail: plan }) {
@@ -146,73 +139,73 @@ export class CcPricingProduct extends LitElement {
       // language=CSS
       skeletonStyles,
       css`
-        :host {
-          background-color: #ffffff;
-          display: block;
-        }
+          :host {
+              background-color: #ffffff;
+              display: block;
+          }
 
-        .head {
-          display: grid;
-          gap: 1em;
-          grid-auto-rows: min-content;
-          padding: 1em;
-        }
+          .head {
+              display: grid;
+              gap: 1em;
+              grid-auto-rows: min-content;
+              padding: 1em;
+          }
 
-        /* We cannot use cc-flex-gap because of a double slot */
-        .head-info {
-          display: flex;
-          flex-wrap: wrap;
-          /* reset gap for browsers that support gap for flexbox */
-          gap: 0;
-          margin: -0.5em;
-        }
+          /* We cannot use cc-flex-gap because of a double slot */
+          .head-info {
+              display: flex;
+              flex-wrap: wrap;
+              /* reset gap for browsers that support gap for flexbox */
+              gap: 0;
+              margin: -0.5em;
+          }
 
-        .product-logo,
-        slot[name="icon"]::slotted(*),
-        .name {
-          margin: 0.5em;
-        }
+          .product-logo,
+          slot[name="icon"]::slotted(*),
+          .name {
+              margin: 0.5em;
+          }
 
-        .product-logo,
-        slot[name=icon]::slotted(*) {
-          --cc-img-fit: contain;
-          border-radius: 0.25em;
-          display: block;
-          height: 3em;
-          width: 3em;
-        }
+          .product-logo,
+          slot[name=icon]::slotted(*) {
+              --cc-img-fit: contain;
+              border-radius: 0.25em;
+              display: block;
+              height: 3em;
+              width: 3em;
+          }
 
-        .name {
-          align-self: center;
-          font-size: 1.5em;
-          font-weight: bold;
-        }
+          .name {
+              align-self: center;
+              font-size: 1.5em;
+              font-weight: bold;
+          }
 
-        /* Slotted description */
-        .description {
-          line-height: 1.5;
-        }
+          /* Slotted description */
+          .description {
+              line-height: 1.5;
+          }
 
-        .pricing-table {
-          overflow: auto;
-        }
+          .pricing-table {
+              overflow: auto;
+          }
 
-        .skeleton {
-          background-color: #bbb;
-        }
+          .skeleton {
+              background-color: #bbb;
+          }
 
-        :host([error]) .skeleton,
-        :host([error]) [skeleton] {
-          --cc-skeleton-state: paused;
-        }
+          :host([error]) .skeleton,
+          :host([error]) [skeleton] {
+              --cc-skeleton-state: paused;
+          }
 
-        cc-loader {
-          min-height: 20em;
-        }
+          cc-loader {
+              min-height: 20em;
+          }
 
-        cc-error {
-          padding: 0 1em 1em;
-        }
+          cc-error {
+              padding: 0 1em 1em;
+          }
       `,
     ];
   }

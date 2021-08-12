@@ -10,43 +10,25 @@ import { shoelaceStyles } from '../styles/shoelace.js';
 import { skeletonStyles } from '../styles/skeleton.js';
 import { CcZone } from '../zones/cc-zone.js';
 
+// TODO: I've typed it here but shall we do it for the others skeleton?
+/** @type {Currency[]} */
 const SKELETON_CURRENCIES = [];
+/** @type {Zone[]} */
 const SKELETON_ZONES = [];
 
-/** @type {Object} */
+/** @type {Currency} */
 const CURRENCY_EUR = { code: 'EUR', changeRate: 1 };
+
+/**
+ * @typedef {import('./types.js').Currency} Currency
+ * @typedef {import('./types.js').Plan} Plan
+ * @typedef {import('../types.js').Zone} Zone
+ */
 
 /**
  * A component that displays a total price and allows the selection of a currency and a zone.
  *
- * ## Type definitions
- *
- * ```js
- * interface Currency {
- *   name: string,
- *   code: string,
- * }
- *
- * ```js
- * interface Zone {
- *   name: string,          // Unique code/identifier for the zone
- *   lat: number,           // Latitude
- *   lon: number,           // Longitude
- *   countryCode: string,   // ISO 3166-1 alpha-2 code of the country (2 letters): "FR", "CA", "US"...
- *   city: string,          // Name of the city in english: "Paris", "Montreal", "New York City"...
- *   country: string,       // Name of the country in english: "France", "Canada", "United States"...
- *   displayName?: string,  // Optional display name for private zones (instead of displaying city + country): "ACME (dedicated)"...
- *   tags: string[],        // Array of strings for semantic tags: ["region:eu", "infra:clever-cloud"], ["scope:private"]...
- * }
- * ```
- *
  * @cssdisplay block
- *
- * @prop {Currency[]} currencies - Sets the list of currencies available for selection.
- * @prop {Currency} currency - Sets the current selected currency.
- * @prop {Number} totalPrice - Sets total price to display.
- * @prop {String} zoneId - Sets the current selected zone by its ID/name.
- * @prop {Zone[]} zones - Sets the list of zones available for selection.
  *
  * @event {CustomEvent<Currency>} cc-pricing-header:change-currency - Fires the `currency` whenever the currency selection changes.
  * @event {CustomEvent<String>} cc-pricing-header:change-zone - Fires the `zoneId` (zone name) whenever the zone selection changes.
@@ -66,8 +48,21 @@ export class CcPricingHeader extends LitElement {
 
   constructor () {
     super();
+
+    /** @type {Currency[]} Sets the list of currencies available for selection */
+    this.currencies = null;
+
+    /** @type {Currency}  Sets the current selected currency */
     this.currency = CURRENCY_EUR;
+
+    /** @type {Number} Sets total price to display */
     this.totalPrice = 0;
+
+    /** @type {String} Sets the current selected zone by its ID/name */
+    this.zoneId = null;
+
+    /** @type {Zone[]} Sets the list of zones available for selection */
+    this.zones = null;
   }
 
   _getCurrencySymbol (currency) {
@@ -158,84 +153,84 @@ export class CcPricingHeader extends LitElement {
       skeletonStyles,
       // language=CSS
       css`
-        :host {
-          display: block;
-        }
+          :host {
+              display: block;
+          }
 
-        .main {
-          --cc-gap: 1em;
-          --sl-input-height-medium: 2.5em;
-        }
+          .main {
+              --cc-gap: 1em;
+              --sl-input-height-medium: 2.5em;
+          }
 
-        sl-select {
-          --focus-ring: 0 0 0 .2em rgba(50, 115, 220, .25);
-          --sl-input-background-color-disabled: #eee;
-          --sl-input-border-color-disabled: #eee;
-          --sl-input-border-color-focus: #777;
-          --sl-input-border-color-hover: #777;
-          --sl-input-border-color: #aaa;
-          --sl-input-border-radius-medium: 0.25em;
-          --sl-input-color-focus: #000;
-          --sl-input-color-hover: #000;
-          --sl-input-color: #000;
-        }
+          sl-select {
+              --focus-ring: 0 0 0 .2em rgba(50, 115, 220, .25);
+              --sl-input-background-color-disabled: #eee;
+              --sl-input-border-color-disabled: #eee;
+              --sl-input-border-color-focus: #777;
+              --sl-input-border-color-hover: #777;
+              --sl-input-border-color: #aaa;
+              --sl-input-border-radius-medium: 0.25em;
+              --sl-input-color-focus: #000;
+              --sl-input-color-hover: #000;
+              --sl-input-color: #000;
+          }
 
-        sl-select::part(label),
-        .estimated-cost--label {
-          color: #000;
-          /* same value as out own inputs */
-          padding-bottom: 0.35em;
-        }
+          sl-select::part(label),
+          .estimated-cost--label {
+              color: #000;
+              /* same value as out own inputs */
+              padding-bottom: 0.35em;
+          }
 
-        .currency-select {
-          flex: 1 1 0;
-          min-width: 10em;
-        }
+          .currency-select {
+              flex: 1 1 0;
+              min-width: 10em;
+          }
 
-        .zone-select {
-          flex: 2 1 25em;
-        }
+          .zone-select {
+              flex: 2 1 25em;
+          }
 
-        .zone-item {
-          margin: 0;
-        }
+          .zone-item {
+              margin: 0;
+          }
 
-        /* The label is not used in the list display
-        It's only used for the current selected value */
-        .zone-item::part(label) {
-          display: none;
-        }
+          /* The label is not used in the list display
+          It's only used for the current selected value */
+          .zone-item::part(label) {
+              display: none;
+          }
 
-        /* Expand the cc-zone to the whole width */
-        .zone-item::part(prefix) {
-          display: block;
-          flex: 1 1 0;
-        }
+          /* Expand the cc-zone to the whole width */
+          .zone-item::part(prefix) {
+              display: block;
+              flex: 1 1 0;
+          }
 
-        .zone-item:hover::part(base),
-        .zone-item:focus::part(base) {
-          --cc-zone-subtitle-color: #fff;
-          --cc-zone-tag-bdcolor: #fff;
-          --cc-zone-tag-bgcolor: transparent;
-        }
+          .zone-item:hover::part(base),
+          .zone-item:focus::part(base) {
+              --cc-zone-subtitle-color: #fff;
+              --cc-zone-tag-bdcolor: #fff;
+              --cc-zone-tag-bgcolor: transparent;
+          }
 
-        cc-zone {
-          margin: 0.25em 0 0.25em 0.5em;
-        }
+          cc-zone {
+              margin: 0.25em 0 0.25em 0.5em;
+          }
 
-        .estimated-cost--value {
-          font-weight: bold;
-          height: var(--sl-input-height-medium);
-          line-height: var(--sl-input-height-medium);
-        }
+          .estimated-cost--value {
+              font-weight: bold;
+              height: var(--sl-input-height-medium);
+              line-height: var(--sl-input-height-medium);
+          }
 
-        .total-price {
-          font-size: 1.5em;
-        }
+          .total-price {
+              font-size: 1.5em;
+          }
 
-        sl-select.skeleton::part(base) {
-          --sl-input-background-color-disabled: #bbb;
-        }
+          sl-select.skeleton::part(base) {
+              --sl-input-background-color-disabled: #bbb;
+          }
       `,
     ];
   }

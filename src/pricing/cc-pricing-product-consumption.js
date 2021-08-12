@@ -40,6 +40,13 @@ const SKELETON_INTERVALS = [
 ];
 
 /**
+ * @typedef {import('./types.js').Currency} Currency
+ * @typedef {import('./types.js').Feature} Feature
+ * @typedef {import('./types.js').Plan} Plan
+ * @typedef {import('./types.js').Section} Section
+ */
+
+/**
  * A component to simulate pricing for products with consumption based pricings (Cellar, FS Buckets, Pulsar...).
  *
  * ## Details
@@ -48,44 +55,6 @@ const SKELETON_INTERVALS = [
  * * Interval ranges are defined in bytes.
  * * To comply with `<cc-pricing-product>`, the price in the event `cc-pricing-product:add-plan` is in "euros / 1 hour".
  * * When a section has a nullish `intervals`, a skeleton screen UI pattern is displayed for this section (loading hint).
- *
- * ## Type definitions
- *
- * ```js
- * interface Section {
- *   type: SectionType,
- *   intervals?: Interval[],
- * }
- * ```
- *
- * ```js
- *   type SectionType = "storage"|"inbound-traffic"|"outbound-traffic"
- * ```
- *
- * ```js
- * interface Interval {
- *   minRange: number, // byte
- *   maxRange: number, // byte
- *   price: number,    // "euros / byte / 30 days" or just "euros / byte" for timeless sections like traffic
- * }
- * ```
- *
- * ```js
- * interface Plan {
- *   productName: string,
- *   name: string,
- *   price: number, // "euros / 1 hour"
- *   features: Feature[],
- * }
- * ```
- *
- * ```js
- * interface Feature {
- *   code: "connection-limit" | "cpu" | "databases" | "disk-size" | "gpu" | "has-logs" | "has-metrics" | "max-db-size" | "memory" | "version",
- *   type: "boolean" | "shared" | "bytes" | "number" | "runtime" | "string",
- *   value?: number|string, // Only required for a plan feature
- * }
- * ```
  *
  * @cssdisplay block
  *
@@ -117,10 +86,27 @@ export class CcPricingProductConsumption extends withResizeObserver(LitElement) 
 
   constructor () {
     super();
+
+    /** @type {"add"|"none"} Sets the type of action: "add" to display the "add" button for the product and "none" for no actions (defaults to "add") */
     this.action = 'add';
+
+    /** @type {Currency} Sets the currency used to display the prices (defaults to euros) */
     this.currency = CURRENCY_EUR;
+
+    /** @type {Boolean} Displays an error message */
     this.error = false;
+
+    /** @type {String} Sets the url of the product icon/logo image */
+    this.icon = null;
+
+    /** @type {String} Sets the name of the product */
+    this.name = null;
+
+    /** @type {Section[]} Sets the different sections with their `type` and `intervals` */
+    this.sections = null;
+
     this._simulator = new PricingConsumptionSimulator();
+
     this._state = {};
   }
 
@@ -440,221 +426,221 @@ export class CcPricingProductConsumption extends withResizeObserver(LitElement) 
       skeletonStyles,
       // language=CSS
       css`
-        /*#region COMMON*/
+          /*#region COMMON*/
 
-        :host {
-          background-color: #fff;
-          display: block;
-        }
+          :host {
+              background-color: #fff;
+              display: block;
+          }
 
-        :host([error]) {
-          --cc-skeleton-state: paused;
-        }
+          :host([error]) {
+              --cc-skeleton-state: paused;
+          }
 
-        .head {
-          border-radius: 0.25em;
-          display: grid;
-          gap: 1em;
-          grid-auto-rows: min-content;
-          padding: 1em 1em 0 1em;
-        }
+          .head {
+              border-radius: 0.25em;
+              display: grid;
+              gap: 1em;
+              grid-auto-rows: min-content;
+              padding: 1em 1em 0 1em;
+          }
 
-        /* We cannot use cc-flex-gap because of a double slot */
-        .head-info {
-          display: flex;
-          flex-wrap: wrap;
-          /* reset gap for browsers that support gap for flexbox */
-          gap: 0;
-          margin: -0.5em;
-        }
+          /* We cannot use cc-flex-gap because of a double slot */
+          .head-info {
+              display: flex;
+              flex-wrap: wrap;
+              /* reset gap for browsers that support gap for flexbox */
+              gap: 0;
+              margin: -0.5em;
+          }
 
-        .product-logo,
-        slot[name="icon"]::slotted(*),
-        .name-wrapper {
-          margin: 0.5em;
-        }
+          .product-logo,
+          slot[name="icon"]::slotted(*),
+          .name-wrapper {
+              margin: 0.5em;
+          }
 
-        .product-logo,
-        slot[name=icon]::slotted(*) {
-          --cc-img-fit: contain;
-          border-radius: 0.25em;
-          display: block;
-          height: 3em;
-          width: 3em;
-        }
+          .product-logo,
+          slot[name=icon]::slotted(*) {
+              --cc-img-fit: contain;
+              border-radius: 0.25em;
+              display: block;
+              height: 3em;
+              width: 3em;
+          }
 
-        .name-wrapper {
-          align-self: center;
-          font-weight: bold;
-        }
+          .name-wrapper {
+              align-self: center;
+              font-weight: bold;
+          }
 
-        .name {
-          font-size: 1.5em;
-        }
+          .name {
+              font-size: 1.5em;
+          }
 
-        /* Slotted description */
-        .description {
-          line-height: 1.5;
-        }
+          /* Slotted description */
+          .description {
+              line-height: 1.5;
+          }
 
-        .body {
-          align-items: center;
-          display: grid;
-          overflow: visible;
-          white-space: nowrap;
-        }
+          .body {
+              align-items: center;
+              display: grid;
+              overflow: visible;
+              white-space: nowrap;
+          }
 
-        /* these elements could be removed but they help the readability of the whole template in source code and browser devtools */
-        .section,
-        .section-header,
-        .interval-line {
-          display: contents;
-        }
+          /* these elements could be removed but they help the readability of the whole template in source code and browser devtools */
+          .section,
+          .section-header,
+          .interval-line {
+              display: contents;
+          }
 
-        hr {
-          border-color: #e5e5e5;
-          border-style: solid;
-          border-width: 1px 0 0 0;
-          grid-column: 1 / -1;
-          margin: 1em 0;
-          width: 100%;
-        }
+          hr {
+              border-color: #e5e5e5;
+              border-style: solid;
+              border-width: 1px 0 0 0;
+              grid-column: 1 / -1;
+              margin: 1em 0;
+              width: 100%;
+          }
 
-        hr.last {
-          margin-bottom: 0;
-        }
+          hr.last {
+              margin-bottom: 0;
+          }
 
-        .section-icon {
-          grid-column: section-icon / span 1;
-          height: 1em;
-          margin-right: 1em;
-          width: 1em;
-        }
+          .section-icon {
+              grid-column: section-icon / span 1;
+              height: 1em;
+              margin-right: 1em;
+              width: 1em;
+          }
 
-        .section-title {
-          display: flex;
-          font-weight: bold;
-          grid-column: title / title--end;
-          justify-content: space-between;
-        }
+          .section-title {
+              display: flex;
+              font-weight: bold;
+              grid-column: title / title--end;
+              justify-content: space-between;
+          }
 
-        .section-title.section-title--subtotal,
-        .section-title.section-title--total {
-          grid-column: title / title-total--end;
-        }
+          .section-title.section-title--subtotal,
+          .section-title.section-title--total {
+              grid-column: title / title-total--end;
+          }
 
-        .section-title.section-title--subtotal {
-          margin-top: 0.5em;
-        }
+          .section-title.section-title--subtotal {
+              margin-top: 0.5em;
+          }
 
-        .section-title.section-title--subtotal .section-title-text {
-          font-weight: normal;
-        }
+          .section-title.section-title--subtotal .section-title-text {
+              font-weight: normal;
+          }
 
-        .section-title-price {
-          margin-left: 1em;
-        }
+          .section-title-price {
+              margin-left: 1em;
+          }
 
-        .input-wrapper {
-          align-items: end;
-          display: flex;
-          grid-column: input-wrapper / input-wrapper--end;
-          margin: 1em 0;
-          width: 100%;
-        }
+          .input-wrapper {
+              align-items: end;
+              display: flex;
+              grid-column: input-wrapper / input-wrapper--end;
+              margin: 1em 0;
+              width: 100%;
+          }
 
-        .input-quantity {
-          flex: 1 1 0;
-          min-width: 10ch;
-        }
+          .input-quantity {
+              flex: 1 1 0;
+              min-width: 10ch;
+          }
 
-        .input-unit {
-          --cc-text-transform: none;
-          margin-left: 0.5em;
-        }
+          .input-unit {
+              --cc-text-transform: none;
+              margin-left: 0.5em;
+          }
 
-        cc-error {
-          grid-column: interval-min / end;
-          line-height: 1.5;
-          white-space: normal;
-        }
+          cc-error {
+              grid-column: interval-min / end;
+              line-height: 1.5;
+              white-space: normal;
+          }
 
-        cc-error.error-global {
-          grid-column: start / end;
-        }
+          cc-error.error-global {
+              grid-column: start / end;
+          }
 
-        .interval-line {
-          --bdrs: 5px;
-        }
+          .interval-line {
+              --bdrs: 5px;
+          }
 
-        .interval,
-        .interval-price,
-        .estimated-price {
-          align-self: stretch;
-          margin: 0.1em 0;
-          padding-left: 0.25em;
-          padding-top: 0.15em;
-        }
+          .interval,
+          .interval-price,
+          .estimated-price {
+              align-self: stretch;
+              margin: 0.1em 0;
+              padding-left: 0.25em;
+              padding-top: 0.15em;
+          }
 
-        .interval,
-        .interval-price {
-          padding-bottom: 0.15em;
-          padding-right: 0.25em;
-        }
+          .interval,
+          .interval-price {
+              padding-bottom: 0.15em;
+              padding-right: 0.25em;
+          }
 
-        .interval-line.highlighted .interval {
-          background-color: rgba(50, 50, 255, 0.15);
-        }
+          .interval-line.highlighted .interval {
+              background-color: rgba(50, 50, 255, 0.15);
+          }
 
-        .interval-min,
-        .interval-max,
-        .interval-price {
-          text-align: right;
-        }
+          .interval-min,
+          .interval-max,
+          .interval-price {
+              text-align: right;
+          }
 
-        .interval-min {
-          border-radius: var(--bdrs) 0 0 var(--bdrs);
-          grid-column: interval-min / span 1;
-        }
+          .interval-min {
+              border-radius: var(--bdrs) 0 0 var(--bdrs);
+              grid-column: interval-min / span 1;
+          }
 
-        .interval-label {
-          text-align: center;
-        }
+          .interval-label {
+              text-align: center;
+          }
 
-        .interval-price {
-          color: #333;
-          font-style: italic;
-          grid-column: interval-price / interval-price--end;
-        }
+          .interval-price {
+              color: #333;
+              font-style: italic;
+              grid-column: interval-price / interval-price--end;
+          }
 
-        .interval-max {
-          border-radius: 0 var(--bdrs) var(--bdrs) 0;
-        }
+          .interval-max {
+              border-radius: 0 var(--bdrs) var(--bdrs) 0;
+          }
 
-        .estimated-price {
-          font-weight: bold;
-          text-align: right;
-        }
+          .estimated-price {
+              font-weight: bold;
+              text-align: right;
+          }
 
-        .interval-line:not(.highlighted) .estimated-price {
-          visibility: hidden;
-        }
+          .interval-line:not(.highlighted) .estimated-price {
+              visibility: hidden;
+          }
 
-        .button-bar {
-          grid-column: start / end;
-          margin-bottom: 1em;
-        }
+          .button-bar {
+              grid-column: start / end;
+              margin-bottom: 1em;
+          }
 
-        .skeleton {
-          background-color: #bbb;
-        }
+          .skeleton {
+              background-color: #bbb;
+          }
 
-        /*#endregion COMMON*/
+          /*#endregion COMMON*/
 
-        /*#region BIG*/
+          /*#region BIG*/
 
-        .body--big {
-          grid-template-columns:
+          .body--big {
+              grid-template-columns:
             1em
             [start section-icon] 2em
             [title input-wrapper interval-min] min-content
@@ -666,35 +652,35 @@ export class CcPricingProductConsumption extends withResizeObserver(LitElement) 
             [estimated-price interval-price--end] min-content
             [title--end title-total--end] 1fr
             [end] 1em;
-        }
+          }
 
-        .body--big .section-title--subtotal {
-          display: none;
-        }
+          .body--big .section-title--subtotal {
+              display: none;
+          }
 
-        .body--big .section-toggle-btn {
-          display: none;
-        }
+          .body--big .section-toggle-btn {
+              display: none;
+          }
 
-        .body--big .interval-label {
-          text-align: center;
-        }
+          .body--big .interval-label {
+              text-align: center;
+          }
 
-        .body--big .interval-price {
-          margin-left: 2em;
-        }
+          .body--big .interval-price {
+              margin-left: 2em;
+          }
 
-        .body--big .estimated-price {
-          grid-column: estimated-price / span 1;
-          margin-left: 2em;
-        }
+          .body--big .estimated-price {
+              grid-column: estimated-price / span 1;
+              margin-left: 2em;
+          }
 
-        /*#endregion BIG*/
+          /*#endregion BIG*/
 
-        /*#region SMALL*/
+          /*#region SMALL*/
 
-        .body--small {
-          grid-template-columns:
+          .body--small {
+              grid-template-columns:
             1em
             [start section-icon] 2em
             [title input-wrapper interval-min interval-price] min-content
@@ -704,36 +690,36 @@ export class CcPricingProductConsumption extends withResizeObserver(LitElement) 
             [interval-max toggle-btn title--end] min-content
             [input-wrapper--end interval-price--end title-total--end] 1fr
             [end] 1em;
-        }
+          }
 
-        .body--small .section-toggle-btn {
-          grid-column: toggle-btn / end;
-          justify-self: end;
-        }
+          .body--small .section-toggle-btn {
+              grid-column: toggle-btn / end;
+              justify-self: end;
+          }
 
-        .body--small .section--closed .input-wrapper {
-          margin-bottom: 0.5em;
-        }
+          .body--small .section--closed .input-wrapper {
+              margin-bottom: 0.5em;
+          }
 
-        .body--small .section--closed .interval,
-        .body--small .section--closed .interval-price {
-          height: 0;
-          margin-bottom: 0;
-          margin-top: 0;
-          padding-bottom: 0;
-          padding-top: 0;
-          visibility: hidden;
-        }
+          .body--small .section--closed .interval,
+          .body--small .section--closed .interval-price {
+              height: 0;
+              margin-bottom: 0;
+              margin-top: 0;
+              padding-bottom: 0;
+              padding-top: 0;
+              visibility: hidden;
+          }
 
-        .body--small .interval-price {
-          margin-bottom: 1em;
-        }
+          .body--small .interval-price {
+              margin-bottom: 1em;
+          }
 
-        .body--small .estimated-price {
-          display: none;
-        }
+          .body--small .estimated-price {
+              display: none;
+          }
 
-        /*#endregion SMALL*/
+          /*#endregion SMALL*/
       `,
     ];
   }

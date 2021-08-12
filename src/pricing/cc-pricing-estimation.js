@@ -9,46 +9,21 @@ import { ccLink } from '../templates/cc-link.js';
 
 const deleteSvg = new URL('../assets/delete.svg', import.meta.url).href;
 
-/** @type {Object} */
+/** @type {Currency} */
 const CURRENCY_EUR = { code: 'EUR', changeRate: 1 };
+
 const CONTACT_URL = 'https://www.clever-cloud.com/en/contact-sales';
 const SIGN_UP_URL = 'https://api.clever-cloud.com/v2/sessions/signup';
 
 /**
+ * @typedef {import('./types.js').Currency} Currency
+ * @typedef {import('./types.js').Plan} Plan
+ */
+
+/**
  * A component to display a list of selected product plans with the ability to change their quantity or remove them from the list.
  *
- * ## Type definitions
- *
- * ```js
- * interface Currency {
- *   code: string,
- *   changeRate: string,
- * }
- * ```
- *
- * ```js
- * interface Plan {
- *   productName: string,
- *   name: string,
- *   price: number, // price in euros for 1 hour
- *   features: Feature[],
- *   quantity: number,
- * }
- * ```
- *
- * ```js
- * interface Feature {
- *   code: "connection-limit" | "cpu" | "databases" | "disk-size" | "gpu" | "has-logs" | "has-metrics" | "max-db-size" | "memory" | "version",
- *   type: "boolean" | "shared" | "bytes" | "number" | "runtime" | "string",
- *   value?: number|string, // Only required for a plan feature
- * }
- * ```
- *
  * @cssdisplay block
- *
- * @prop {Currency} currency - Sets the current currency.
- * @prop {Plan[]} selectedPlans - Sets the list of selected plans with their quantity.
- * @prop {Number} totalPrice - Sets the total estimated price for all selected plans.
  *
  * @event {CustomEvent<Plan>} cc-pricing-estimation:change-quantity - Fires the plan with a modified quantity whenever the quantity on the input changes.
  * @event {CustomEvent<Plan>} cc-pricing-estimation:delete-plan - Fires the plan whenever a delete button is clicked.
@@ -72,7 +47,14 @@ export class CcPricingEstimation extends withResizeObserver(LitElement) {
     this.breakpoints = {
       width: [600],
     };
+
+    /** @type {Currency} Sets the current currency */
     this.currency = CURRENCY_EUR;
+
+    /** @type {Plan[]} Sets the list of selected plans with their quantity */
+    this.selectedPlans = null;
+
+    /** @type {Number} Sets the total estimated price for all selected plans */
     this.totalPrice = 0;
   }
 
@@ -271,221 +253,221 @@ export class CcPricingEstimation extends withResizeObserver(LitElement) {
     return [
       // language=CSS
       css`
-        /*#region COMMON*/
+          /*#region COMMON*/
 
-        :host {
-          display: block;
-        }
+          :host {
+              display: block;
+          }
 
-        .input-number {
-          --cc-input-number-align: center;
-          /* This is enough to display up to 999 */
-          width: 13ch;
-        }
+          .input-number {
+              --cc-input-number-align: center;
+              /* This is enough to display up to 999 */
+              width: 13ch;
+          }
 
-        .empty-text {
-          font-style: italic;
-          padding: 1em 0;
-          text-align: center;
-        }
+          .empty-text {
+              font-style: italic;
+              padding: 1em 0;
+              text-align: center;
+          }
 
-        .recap {
-          align-items: center;
-          background-color: #3a3771;
-          border-radius: 0.2em;
-          color: #fff;
-          display: grid;
-          gap: 1em;
-          justify-items: center;
-          padding: 2em;
-          white-space: nowrap;
-        }
+          .recap {
+              align-items: center;
+              background-color: #3a3771;
+              border-radius: 0.2em;
+              color: #fff;
+              display: grid;
+              gap: 1em;
+              justify-items: center;
+              padding: 2em;
+              white-space: nowrap;
+          }
 
-        .recap-text {
-          grid-area: text;
-        }
+          .recap-text {
+              grid-area: text;
+          }
 
-        .recap-total {
-          font-weight: bold;
-          grid-area: total;
-        }
+          .recap-total {
+              font-weight: bold;
+              grid-area: total;
+          }
 
-        .recap-contact {
-          grid-area: contact;
-        }
+          .recap-contact {
+              grid-area: contact;
+          }
 
-        .recap-signup {
-          grid-area: signup;
-        }
+          .recap-signup {
+              grid-area: signup;
+          }
 
-        .cc-link {
-          border-radius: 0.2em;
-          cursor: pointer;
-          display: inline-block;
-          font-weight: bold;
-          text-decoration: none;
-        }
+          .cc-link {
+              border-radius: 0.2em;
+              cursor: pointer;
+              display: inline-block;
+              font-weight: bold;
+              text-decoration: none;
+          }
 
-        .cc-link:focus {
-          box-shadow: 0 0 0 .2em #cbdcf6;
-          outline: 0;
-        }
+          .cc-link:focus {
+              box-shadow: 0 0 0 .2em #cbdcf6;
+              outline: 0;
+          }
 
-        .cc-link::-moz-focus-inner {
-          border: 0;
-        }
+          .cc-link::-moz-focus-inner {
+              border: 0;
+          }
 
-        .recap-contact .cc-link {
-          background-color: #fff;
-          color: #3a3871;
-        }
+          .recap-contact .cc-link {
+              background-color: #fff;
+              color: #3a3871;
+          }
 
-        .recap-contact .cc-link:hover {
-          background-color: rgba(255, 255, 255, 0.9);
-        }
+          .recap-contact .cc-link:hover {
+              background-color: rgba(255, 255, 255, 0.9);
+          }
 
-        .recap-signup .cc-link {
-          background-color: transparent;
-          border: 1px solid #ccc;
-          color: #fff;
-        }
+          .recap-signup .cc-link {
+              background-color: transparent;
+              border: 1px solid #ccc;
+              color: #fff;
+          }
 
-        .recap-signup .cc-link:hover {
-          background-color: rgba(255, 255, 255, 0.1);
-        }
+          .recap-signup .cc-link:hover {
+              background-color: rgba(255, 255, 255, 0.1);
+          }
 
-        /*#endregion*/
+          /*#endregion*/
 
-        /*#region BIG*/
+          /*#region BIG*/
 
-        .number-align {
-          text-align: right;
-        }
+          .number-align {
+              text-align: right;
+          }
 
-        table {
-          border-collapse: collapse;
-          border-spacing: 0;
-          width: 100%;
-        }
+          table {
+              border-collapse: collapse;
+              border-spacing: 0;
+              width: 100%;
+          }
 
-        tr:nth-child(n+3) {
-          border-top: 1px solid #e5e5e5;
-        }
+          tr:nth-child(n+3) {
+              border-top: 1px solid #e5e5e5;
+          }
 
-        th {
-          background-color: #f6f6fb;
-          padding: 1em 0.5em;
-          text-align: left;
-        }
+          th {
+              background-color: #f6f6fb;
+              padding: 1em 0.5em;
+              text-align: left;
+          }
 
-        td {
-          padding: 0.5em 0.5em;
-          white-space: nowrap;
-        }
+          td {
+              padding: 0.5em 0.5em;
+              white-space: nowrap;
+          }
 
-        tr:hover td {
-          background-color: #f5f5f5;
-        }
+          tr:hover td {
+              background-color: #f5f5f5;
+          }
 
-        td.btn-col {
-          padding: 0.25em 0.5em;
-        }
+          td.btn-col {
+              padding: 0.25em 0.5em;
+          }
 
-        :host([w-gte-600]) .recap {
-          grid-template-areas:
+          :host([w-gte-600]) .recap {
+              grid-template-areas:
             "text contact signup"
             "total contact signup";
-          grid-template-columns: 1fr min-content min-content;
-        }
+              grid-template-columns: 1fr min-content min-content;
+          }
 
-        :host([w-gte-600]) .recap-text,
-        :host([w-gte-600]) .recap-total {
-          justify-self: start;
-        }
+          :host([w-gte-600]) .recap-text,
+          :host([w-gte-600]) .recap-total {
+              justify-self: start;
+          }
 
-        :host([w-gte-600]) .recap-total {
-          font-size: 2em;
-        }
+          :host([w-gte-600]) .recap-total {
+              font-size: 2em;
+          }
 
-        :host([w-gte-600]) .cc-link {
-          padding: 0.75em 1em;
-        }
+          :host([w-gte-600]) .cc-link {
+              padding: 0.75em 1em;
+          }
 
-        /*#endregion*/
+          /*#endregion*/
 
-        /*#region SMALL*/
+          /*#region SMALL*/
 
-        .plan {
-          align-items: center;
-          border-top: 1px solid #e5e5e5;
-          display: grid;
-          gap: 0 1em;
-          grid-template-columns: min-content [main-start] 1fr min-content [main-end];
-          margin: 0;
-          padding: 1em;
-        }
+          .plan {
+              align-items: center;
+              border-top: 1px solid #e5e5e5;
+              display: grid;
+              gap: 0 1em;
+              grid-template-columns: min-content [main-start] 1fr min-content [main-end];
+              margin: 0;
+              padding: 1em;
+          }
 
-        .product-name {
-          font-size: 1.2em;
-          font-weight: bold;
-        }
+          .product-name {
+              font-size: 1.2em;
+              font-weight: bold;
+          }
 
-        .plan-name {
-          grid-column: main-start / main-end;
-          margin-top: 1em;
-        }
+          .plan-name {
+              grid-column: main-start / main-end;
+              margin-top: 1em;
+          }
 
-        .plan-name-label {
-          font-style: italic;
-          font-weight: bold;
-        }
+          .plan-name-label {
+              font-style: italic;
+              font-weight: bold;
+          }
 
-        .feature-list {
-          display: flex;
-          flex-wrap: wrap;
-          grid-column: main-start / main-end;
-          margin-top: 0.5em;
-        }
+          .feature-list {
+              display: flex;
+              flex-wrap: wrap;
+              grid-column: main-start / main-end;
+              margin-top: 0.5em;
+          }
 
-        .feature {
-          display: flex;
-          justify-content: space-between;
-          line-height: 1.5;
-        }
+          .feature {
+              display: flex;
+              justify-content: space-between;
+              line-height: 1.5;
+          }
 
-        .feature:not(:last-child)::after {
-          content: ',';
-          padding-right: 0.5em;
-        }
+          .feature:not(:last-child)::after {
+              content: ',';
+              padding-right: 0.5em;
+          }
 
-        .feature-name {
-          font-style: italic;
-          font-weight: bold;
-          white-space: nowrap;
-        }
+          .feature-name {
+              font-style: italic;
+              font-weight: bold;
+              white-space: nowrap;
+          }
 
-        .feature-name::after {
-          content: ' :';
-          padding-right: 0.25em;
-        }
+          .feature-name::after {
+              content: ' :';
+              padding-right: 0.25em;
+          }
 
-        :host([w-lt-600]) .recap {
-          grid-template-areas:
+          :host([w-lt-600]) .recap {
+              grid-template-areas:
             "text total"
             "contact signup";
-          grid-template-columns: min-content min-content;
-          justify-content: center;
-        }
+              grid-template-columns: min-content min-content;
+              justify-content: center;
+          }
 
-        :host([w-lt-600]) .recap-total {
-          font-size: 1.5em;
-        }
+          :host([w-lt-600]) .recap-total {
+              font-size: 1.5em;
+          }
 
-        :host([w-lt-600]) .cc-link {
-          padding: 0.75em 1em;
-        }
+          :host([w-lt-600]) .cc-link {
+              padding: 0.75em 1em;
+          }
 
-        /*#endregion*/
+          /*#endregion*/
       `,
     ];
   }
