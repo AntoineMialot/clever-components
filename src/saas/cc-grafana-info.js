@@ -36,9 +36,9 @@ const GRAFANA_ADDON_SCREEN = new URL('../assets/addon.png', import.meta.url).hre
  *
  * @cssdisplay grid
  *
- * @prop {null|"refreshing"|"loading"|"disabling"|"enabling"|link-doc|link-grafana} error - Displays an error message.  
+ * @prop {null|"refreshing"|"loading"|"disabling"|"enabling"|link-doc|link-grafana} error - Displays an error message.
  * @prop {Link[]} links - Sets the different links.
- * @prop {null|"enabled"|"disabled"} status - Grafana acount status, is the Grafana enable or disable. Null means no data are received.  
+ * @prop {null|"enabled"|"disabled"} status - Grafana acount status, is the Grafana enable or disable. Null means no data are received.
  * @prop {null|"refreshing"|"disabling"|"enabling"} waiting - are we waiting an action result response (refresh, disable or enable).
  *
  * @event {CustomEvent} cc-grafana-info:enable - Fires when the enable button is clicked.
@@ -104,14 +104,14 @@ export class CcGrafanaInfo extends LitElement {
 
         <div slot="title" style="font-weight: bold;">${i18n('cc-grafana-info.main-title')}</div>
 
-        ${this.waiting ? html`
+        ${this.waiting === 'enabling' || this.waiting === 'disabling' ? html`
           <cc-loader slot="overlay"></cc-loader>
         ` : ''}
 
         <cc-block-section>
           <div slot="title">${i18n('cc-grafana-info.documentation-title')}</div>
           <div slot="info">${i18n('cc-grafana-info.documentation-description')}</div>
-          ${this.error == "link-doc" ? html`
+          ${this.error === 'link-doc' ? html`
             <cc-error>${i18n('cc-grafana-info.error-link-doc')}</cc-error>
           ` : html`
           <div>
@@ -122,61 +122,80 @@ export class CcGrafanaInfo extends LitElement {
           `}
         </cc-block-section>
 
-        ${!this.status ? html`
+        ${this.error === 'loading' ? html`
           <cc-block-section>
-          <div slot="title">${i18n('cc-grafana-info.loading-title')}</div>
-          <div>
-            <cc-loader></cc-loader> <span>${i18n('cc-grafana-info.loading-data')}</span>
-          </div>
+            <div slot="title">${i18n('cc-grafana-info.loading-title')}</div>
+            <cc-error>${i18n('cc-grafana-info.error-loading')}</cc-error>
           </cc-block-section>
-        ` : ''}
-
-        ${this.status == "disabled" ? html`
-          <cc-block-section>
-            <div slot="title">${i18n('cc-grafana-info.enable-title')}</div>
-            <div slot="info">${i18n('cc-grafana-info.enable-description')}</div>
+        ` : html`
+          ${!this.status ? html`
+            <cc-block-section>
+            <div slot="title">${i18n('cc-grafana-info.loading-title')}</div>
             <div>
-              <cc-button success ?skeleton=${this._skeleton} ?disabled=${isFormDisabled} @cc-button:click=${this._onEnableSubmit}>${i18n('cc-grafana-info.enable')}</cc-button>
+              <cc-loader></cc-loader> <span>${i18n('cc-grafana-info.loading-data')}</span>
             </div>
-          </cc-block-section>
-        ` : ''}
+            </cc-block-section>
+          ` : ''}
 
-        ${this.status == "enabled" ? html`
-          <cc-block-section>
-            <div slot="title">${i18n('cc-grafana-info.grafana-link-title')}</div>
-            <div slot="info">${i18n('cc-grafana-info.grafana-link-description')}</div>
-            ${this.error == "link-grafana" || grafanaLink == null  ? html`
-              <cc-error>${i18n('cc-grafana-info.error-link-grafana')}</cc-error>
-            ` : html`
-            <div>
-              ${grafanaLink != null ? html`
-                ${ccLink(grafanaLink.href, html`
-                  <cc-img src="${GRAFANA_LOGO_URL}"></cc-img>
-                  <span class="${classMap({ skeleton: (grafanaLink.href == null) })}">${i18n('cc-grafana-info.link.grafana')}</span>
-                `)}
-              ` : ''}
-            </div>
-            `}
-          </cc-block-section>
+          ${this.status === 'disabled' ? html`
+            <cc-block-section>
+              <div slot="title">${i18n('cc-grafana-info.enable-title')}</div>
+              <div slot="info">${i18n('cc-grafana-info.enable-description')}</div>
+              ${this.error === 'enabling' ? html`
+                <cc-error>${i18n('cc-grafana-info.error-enabling')}</cc-error>
+              ` : html`
+              <div>
+                <cc-button success ?skeleton=${this._skeleton} ?disabled=${isFormDisabled} @cc-button:click=${this._onEnableSubmit}>${i18n('cc-grafana-info.enable')}</cc-button>
+              </div>
+              `}
+            </cc-block-section>
+          ` : ''}
 
-          <cc-block-section>
-            <div slot="title">${i18n('cc-grafana-info.refresh-title')}</div>
-            <div slot="info">${i18n('cc-grafana-info.refresh-description')}</div>
-            <div>
-              <cc-button primary ?skeleton=${this._skeleton} ?disabled=${isFormDisabled} ?waiting=${this.refreshing} @cc-button:click=${this._onRefreshSubmit}>${i18n('cc-grafana-info.refresh')}</cc-button>
-            </div>
-          </cc-block-section>
+          ${this.status === 'enabled' ? html`
+            <cc-block-section>
+              <div slot="title">${i18n('cc-grafana-info.grafana-link-title')}</div>
+              <div slot="info">${i18n('cc-grafana-info.grafana-link-description')}</div>
+              ${this.error === 'link-grafana' || grafanaLink == null ? html`
+                <cc-error>${i18n('cc-grafana-info.error-link-grafana')}</cc-error>
+              ` : html`
+              <div>
+                ${grafanaLink != null ? html`
+                  ${ccLink(grafanaLink.href, html`
+                    <cc-img src="${GRAFANA_LOGO_URL}"></cc-img>
+                    <span class="${classMap({ skeleton: (grafanaLink.href == null) })}">${i18n('cc-grafana-info.link.grafana')}</span>
+                  `)}
+                ` : ''}
+              </div>
+              `}
+            </cc-block-section>
 
-          <cc-block-section>
-            <div slot="title">${i18n('cc-grafana-info.disable-title')}</div>
-            <div slot="info">${i18n('cc-grafana-info.disable-description')}</div>
-            <div>
-              <cc-button danger delay="3" ?skeleton=${this._skeleton} ?disabled=${isFormDisabled} @cc-button:click=${this._onDisableSubmit}>${i18n('cc-grafana-info.disable')}</cc-button>
-            </div>
-          </cc-block-section>
-        ` : ''}
+            <cc-block-section>
+              <div slot="title">${i18n('cc-grafana-info.refresh-title')}</div>
+              <div slot="info">${i18n('cc-grafana-info.refresh-description')}</div>
+              ${this.error === 'refreshing' ? html`
+                <cc-error>${i18n('cc-grafana-info.error-refreshing')}</cc-error>
+              ` : html`
+                <div>
+                  <cc-button primary ?skeleton=${this._skeleton} ?disabled=${isFormDisabled} ?waiting=${this.waiting === 'refreshing'} @cc-button:click=${this._onRefreshSubmit}>${i18n('cc-grafana-info.refresh')}</cc-button>
+                </div>
+              `}
+            </cc-block-section>
 
-        ${!this.waiting ? html`
+            <cc-block-section>
+              <div slot="title">${i18n('cc-grafana-info.disable-title')}</div>
+              <div slot="info">${i18n('cc-grafana-info.disable-description')}</div>
+              ${this.error === 'disabling' ? html`
+                <cc-error>${i18n('cc-grafana-info.error-disabling')}</cc-error>
+              ` : html`
+                <div>
+                  <cc-button danger delay="3" ?skeleton=${this._skeleton} ?disabled=${isFormDisabled} @cc-button:click=${this._onDisableSubmit}>${i18n('cc-grafana-info.disable')}</cc-button>
+                </div>
+              `}
+            </cc-block-section>
+          ` : ''}
+        `}
+
+        ${!this.waiting || this.waiting === 'refreshing' ? html`
           ${dashboards.map((item) => html`
             <cc-block-section>
               <div slot="title">${item.title}</div>

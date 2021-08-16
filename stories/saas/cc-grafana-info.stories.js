@@ -21,29 +21,29 @@ const grafanaLink = { type: 'grafana', href: 'https://my-grafana.com' };
 // TODO: On a besoin de quelles stories:
 // * je sais pas encore si l'orga a le grafana disabled ou enabled => loading  OK
 //   * => un cc-loader + message entre doc et screenshots  OK
-// * j'ai des données (est-ce que disabled ou enabled)
-//   * dataLoadedWithEnabled  
-//   * dataLoadedWithDisabled
-// * error chargement des données
-//   * => le message d'erreur entre doc et screenshots
-// * je suis en train de travailler
-//   * => waiting (en train de disable ou enable)
-//   * => refreshing (en train de refresh)
-// * => error action
-//   * => error disable
-//   * => error enable
-//   * => error refresh
+// * j'ai des données (est-ce que disabled ou enabled) OK
+//   * dataLoadedWithEnabled   OK
+//   * dataLoadedWithDisabled OK
+// * error chargement des données  OK
+//   * => le message d'erreur entre doc et screenshots  OK
+// * je suis en train de travailler OK
+//   * => waiting (en train de disable ou enable) OK
+//   * => refreshing (en train de refresh) OK
+// * => error action OK
+//   * => error disable OK
+//   * => error enable OK 
+//   * => error refresh OK
 // * simus
-//   * skeleton => data
-//   * skeleton => error
-//   * data => waiting => data
-//   * data => waiting => error
+//   * skeleton => data OK
+//   * skeleton => error OK
+//   * data => waiting => data OK
+//   * data => waiting => error OK 
 
 // I/O du composants vv
-// * error: false|"refreshing"|"loading"|"disabling"|"enabling"|"link"
-// * status: null|"enabled"|"disabled"
-// * waiting: null|"refreshing"|"disabling"|"enabling"
-//   => disable les boutons
+// * error: false|"refreshing"|"loading"|"disabling"|"enabling"|"link" OK
+// * status: null|"enabled"|"disabled" OK
+// * waiting: null|"refreshing"|"disabling"|"enabling" OK 
+//   => disable les boutons 
 
 // Exemples
 // => addon-admin
@@ -58,102 +58,260 @@ export const skeleton = makeStory(conf, {
 
 export const errorWithLinkDoc = makeStory(conf, {
   items: [
-    { 
-      links: [grafanaLink], 
-      error: "link-doc" 
-    }
+    {
+      links: [grafanaLink],
+      error: 'link-doc',
+    },
   ],
 });
 
-
-export const errorWithLinkGrafana = makeStory(conf, {
+export const errorWithLoading = makeStory(conf, {
   items: [
-    { 
-      links: [grafanaLink], 
-      status: "enabled",
-      error: "link-grafana" 
-    }
+    {
+      links: [grafanaLink],
+      error: 'loading',
+    },
   ],
 });
 
 export const dataLoadedWithDisabled = makeStory(conf, {
   items: [{
     links: [grafanaLink],
-    status: "disabled",
+    status: 'disabled',
   }],
 });
 
 export const dataLoadedWithEnabled = makeStory(conf, {
   items: [{
     links: [grafanaLink],
-    status: "enabled",
+    status: 'enabled',
   }],
 });
 
 export const skeletonWithWaitingEnabled = makeStory(conf, {
   items: [{
     links: [grafanaLink],
-    status: "enabled",
-    waiting: true,
+    status: 'enabled',
+    waiting: 'disabling',
   }],
 });
 
 export const skeletonWithWaitingDisabled = makeStory(conf, {
   items: [{
     links: [grafanaLink],
-    status: "disabled",
-    waiting: true,
+    status: 'disabled',
+    waiting: 'enabling',
   }],
 });
 
-export const simulations = makeStory(conf, {
+export const skeletonWithWaitingRefresh = makeStory(conf, {
+  items: [{
+    links: [grafanaLink],
+    status: 'enabled',
+    waiting: 'refreshing',
+  }],
+});
+
+export const errorWithEnabling = makeStory(conf, {
   items: [
-    { 
-      links: [{ type: 'grafana' }], 
-      status: "enabled",
+    {
+      links: [grafanaLink],
+      status: 'disabled',
+      error: 'enabling',
     },
-    { },
+  ],
+});
+
+export const errorWithDisabling = makeStory(conf, {
+  items: [
+    {
+      links: [grafanaLink],
+      status: 'enabled',
+      error: 'disabling',
+    },
+  ],
+});
+
+export const errorWithRefreshing = makeStory(conf, {
+  items: [
+    {
+      links: [grafanaLink],
+      status: 'enabled',
+      error: 'refreshing',
+    },
+  ],
+});
+
+export const errorWithLinkGrafanaEnabled = makeStory(conf, {
+  items: [
+    {
+      links: [grafanaLink],
+      status: 'enabled',
+      error: 'link-grafana',
+    },
+  ],
+});
+
+export const simulationsWithLoadingEnable = makeStory(conf, {
+  items: [
+    {
+      links: [{ type: 'grafana' }],
+    }
   ],
   simulations: [
-    storyWait(2000, ([component, componentError]) => {
+    storyWait(2000, ([component]) => {
       component.links = [grafanaLink];
-      componentError.error = "link";
+      component.status = 'enabled';
+    }),
+  ],
+});
+
+export const simulationsWithLoadingDisable = makeStory(conf, {
+  items: [
+    {
+      links: [{ type: 'grafana' }],
+    }
+  ],
+  simulations: [
+    storyWait(2000, ([component]) => {
+      component.status = 'disabled';
+    }),
+  ],
+});
+
+export const simulationsWithLoadingError = makeStory(conf, {
+  items: [
+    {
+      links: [{ type: 'grafana' }],
+    }
+  ],
+  simulations: [
+    storyWait(2000, ([component]) => {
+      component.error = 'loading';
     }),
   ],
 });
 
 export const simulationsWithWaitingToEnable = makeStory(conf, {
   items: [
-    { 
-      links: [grafanaLink], 
-      status: "disabled",
+    {
+      links: [grafanaLink],
+      status: 'disabled',
     },
   ],
   simulations: [
     storyWait(2000, ([component]) => {
-      component.waiting = true;
+      component.waiting = 'enabling';
     }),
     storyWait(2000, ([component]) => {
       component.waiting = false;
-      component.status = "enabled";
+      component.status = 'enabled';
     }),
   ],
 });
 
 export const simulationsWithWaitingToDisable = makeStory(conf, {
   items: [
-    { 
-      links: [grafanaLink], 
-      status: "enabled",
+    {
+      links: [grafanaLink],
+      status: 'enabled',
     },
   ],
   simulations: [
     storyWait(2000, ([component]) => {
-      component.waiting = true;
+      component.waiting = 'disabling';
     }),
     storyWait(2000, ([component]) => {
       component.waiting = false;
-      component.status = "disabled";
+      component.status = 'disabled';
+    }),
+  ],
+});
+
+export const simulationsWithWaitingToRefresh = makeStory(conf, {
+  items: [
+    {
+      links: [grafanaLink],
+      status: 'enabled',
+    },
+  ],
+  simulations: [
+    storyWait(2000, ([component]) => {
+      component.waiting = 'refreshing';
+    }),
+    storyWait(2000, ([component]) => {
+      component.waiting = false;
+      component.status = 'enabled';
+    }),
+  ],
+});
+
+export const simulationsWithErrorToEnable = makeStory(conf, {
+  items: [
+    {
+      links: [grafanaLink],
+      status: 'disabled',
+    },
+  ],
+  simulations: [
+    storyWait(2000, ([component]) => {
+      component.waiting = 'enabling';
+    }),
+    storyWait(2000, ([component]) => {
+      component.waiting = false;
+      component.error = 'enabling';
+    }),
+  ],
+});
+
+export const simulationsWithErrorEnablingLink = makeStory(conf, {
+  items: [
+    {
+      links: [{ type: 'grafana' }],
+      status: 'enabled',
+    },
+  ],
+  simulations: [
+    storyWait(2000, ([component]) => {
+      component.links = [grafanaLink];
+      component.error = 'link-grafana';
+      component.status = 'enabled';
+    }),
+  ],
+});
+
+export const simulationsWithErrorToDisable = makeStory(conf, {
+  items: [
+    {
+      links: [grafanaLink],
+      status: 'enabled',
+    },
+  ],
+  simulations: [
+    storyWait(2000, ([component]) => {
+      component.waiting = 'disabling';
+    }),
+    storyWait(2000, ([component]) => {
+      component.waiting = false;
+      component.error = 'disabling';
+    }),
+  ],
+});
+
+export const simulationsWithErrorToRefresh = makeStory(conf, {
+  items: [
+    {
+      links: [grafanaLink],
+      status: 'enabled',
+    },
+  ],
+  simulations: [
+    storyWait(2000, ([component]) => {
+      component.waiting = 'refreshing';
+    }),
+    storyWait(2000, ([component]) => {
+      component.waiting = false;
+      component.error = 'refreshing';
     }),
   ],
 });
@@ -161,12 +319,24 @@ export const simulationsWithWaitingToDisable = makeStory(conf, {
 enhanceStoriesNames({
   skeleton,
   errorWithLinkDoc,
-  errorWithLinkGrafana,
+  errorWithLoading,
   dataLoadedWithDisabled,
   dataLoadedWithEnabled,
   skeletonWithWaitingEnabled,
   skeletonWithWaitingDisabled,
-  simulations,
+  skeletonWithWaitingRefresh,
+  errorWithEnabling,
+  errorWithDisabling,
+  errorWithRefreshing,
+  errorWithLinkGrafanaEnabled,
+  simulationsWithLoadingEnable,
+  simulationsWithLoadingDisable,
+  simulationsWithLoadingError,
   simulationsWithWaitingToEnable,
   simulationsWithWaitingToDisable,
+  simulationsWithWaitingToRefresh,
+  simulationsWithErrorToEnable,
+  simulationsWithErrorEnablingLink,
+  simulationsWithErrorToDisable,
+  simulationsWithErrorToRefresh,
 });
