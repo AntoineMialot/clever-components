@@ -43,7 +43,7 @@ const grafanaLink = { type: 'grafana', href: 'https://my-grafana.com' };
 // * error: false|"refreshing"|"loading"|"disabling"|"enabling"|"link" OK
 // * status: null|"enabled"|"disabled" OK
 // * waiting: null|"refreshing"|"disabling"|"enabling" OK 
-//   => disable les boutons 
+//   => disable les boutons  OK
 
 // Exemples
 // => addon-admin

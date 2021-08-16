@@ -36,10 +36,10 @@ const GRAFANA_ADDON_SCREEN = new URL('../assets/addon.png', import.meta.url).hre
  *
  * @cssdisplay grid
  *
- * @prop {null|"refreshing"|"loading"|"disabling"|"enabling"|link-doc|link-grafana} error - Displays an error message.
+ * @prop {false|"refreshing"|"loading"|"disabling"|"enabling"|link-doc|link-grafana} error - Displays an error message.
  * @prop {Link[]} links - Sets the different links.
  * @prop {null|"enabled"|"disabled"} status - Grafana acount status, is the Grafana enable or disable. Null means no data are received.
- * @prop {null|"refreshing"|"disabling"|"enabling"} waiting - are we waiting an action result response (refresh, disable or enable).
+ * @prop {false|"refreshing"|"disabling"|"enabling"} waiting - are we waiting an action result response (refresh, disable or enable).
  *
  * @event {CustomEvent} cc-grafana-info:enable - Fires when the enable button is clicked.
  * @event {CustomEvent} cc-grafana-info:disable - Fires when the disable button is clicked.
@@ -58,9 +58,9 @@ export class CcGrafanaInfo extends LitElement {
 
   constructor () {
     super();
-    this.error = null;
+    this.error = false;
     this.status = null;
-    this.waiting = null;
+    this.waiting = false;
   }
 
   _onEnableSubmit () {
@@ -79,7 +79,7 @@ export class CcGrafanaInfo extends LitElement {
 
     const links = this.links ?? [];
     const grafanaLink = links.find(({ type }) => type === 'grafana');
-    const isFormDisabled = (this.error !== false) ?? this.saving;
+    const isFormDisabled = this.error !== false || this.waiting !== false;
     const dashboards = [
       {
         title: i18n('cc-grafana-info.organization-title'),
