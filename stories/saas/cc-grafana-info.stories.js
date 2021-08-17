@@ -18,38 +18,6 @@ const conf = {
 
 const grafanaLink = { type: 'grafana', href: 'https://my-grafana.com' };
 
-// TODO: On a besoin de quelles stories:
-// * je sais pas encore si l'orga a le grafana disabled ou enabled => loading  OK
-//   * => un cc-loader + message entre doc et screenshots  OK
-// * j'ai des données (est-ce que disabled ou enabled) OK
-//   * dataLoadedWithEnabled   OK
-//   * dataLoadedWithDisabled OK
-// * error chargement des données  OK
-//   * => le message d'erreur entre doc et screenshots  OK
-// * je suis en train de travailler OK
-//   * => waiting (en train de disable ou enable) OK
-//   * => refreshing (en train de refresh) OK
-// * => error action OK
-//   * => error disable OK
-//   * => error enable OK 
-//   * => error refresh OK
-// * simus
-//   * skeleton => data OK
-//   * skeleton => error OK
-//   * data => waiting => data OK
-//   * data => waiting => error OK 
-
-// I/O du composants vv
-// * error: false|"refreshing"|"loading"|"disabling"|"enabling"|"link" OK
-// * status: null|"enabled"|"disabled" OK
-// * waiting: null|"refreshing"|"disabling"|"enabling" OK 
-//   => disable les boutons  OK
-
-// Exemples
-// => addon-admin
-// => env-var-form
-// => cc-example-component.stories.js
-
 export const skeleton = makeStory(conf, {
   items: [{
     links: [grafanaLink],

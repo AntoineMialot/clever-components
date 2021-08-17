@@ -12,13 +12,13 @@ import { ccLink, linkStyles } from '../templates/cc-link.js';
 const infoSvg = new URL('../assets/info.svg', import.meta.url).href;
 
 const GRAFANA_LOGO_URL = 'https://static-assets.cellar.services.clever-cloud.com/logos/grafana.svg';
-const GRAFANA_DOCUMENTATION = 'https://www.clever-cloud.com/doc/addons/elastic/';
+const GRAFANA_DOCUMENTATION = 'https://www.clever-cloud.com/doc/administrate/metrics/overview/';
 const GRAFANA_ORG_SCREEN = new URL('../assets/organization.png', import.meta.url).href;
 const GRAFANA_APPLICATION_SCREEN = new URL('../assets/application.png', import.meta.url).href;
 const GRAFANA_ADDON_SCREEN = new URL('../assets/addon.png', import.meta.url).href;
 
 /**
- * A component to display various links (Documentation, kibana, APM) for an grafana service.
+ * A component to display enable/disable a grafana service.
  *
  * ## Details
  *
@@ -85,16 +85,19 @@ export class CcGrafanaInfo extends LitElement {
         title: i18n('cc-grafana-info.organization-title'),
         url: GRAFANA_ORG_SCREEN,
         description: i18n('cc-grafana-info.organization-description'),
+        alt: 'grafana main organization dashboard',
       },
       {
         title: i18n('cc-grafana-info.runtime-title'),
         url: GRAFANA_APPLICATION_SCREEN,
         description: i18n('cc-grafana-info.runtime-description'),
+        alt: 'grafana application runtime dashboard',
       },
       {
         title: i18n('cc-grafana-info.addon-title'),
         url: GRAFANA_ADDON_SCREEN,
         description: i18n('cc-grafana-info.addon-description'),
+        alt: 'grafana application addon dashboard',
       },
     ];
 
@@ -202,7 +205,7 @@ export class CcGrafanaInfo extends LitElement {
               <div slot="info">${item.description}</div>
               <div>
                 ${ccLink(item.url, html`
-                  <img class="dashboard-screenshot" src="${item.url}" alt="TODO">
+                  <img class="dashboard-screenshot" src="${item.url}" alt="${item.alt}">
                 `)}
               </div>
             </cc-block-section>
