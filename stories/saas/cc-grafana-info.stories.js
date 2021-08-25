@@ -72,11 +72,11 @@ export const skeletonWithWaitingDisabled = makeStory(conf, {
   }],
 });
 
-export const skeletonWithWaitingRefresh = makeStory(conf, {
+export const skeletonWithWaitingReset = makeStory(conf, {
   items: [{
     links: [grafanaLink],
     status: 'enabled',
-    waiting: 'refreshing',
+    waiting: 'reseting',
   }],
 });
 
@@ -100,12 +100,12 @@ export const errorWithDisabling = makeStory(conf, {
   ],
 });
 
-export const errorWithRefreshing = makeStory(conf, {
+export const errorWithReseting = makeStory(conf, {
   items: [
     {
       links: [grafanaLink],
       status: 'enabled',
-      error: 'refreshing',
+      error: 'reseting',
     },
   ],
 });
@@ -124,7 +124,7 @@ export const simulationsWithLoadingEnable = makeStory(conf, {
   items: [
     {
       links: [{ type: 'grafana' }],
-    }
+    },
   ],
   simulations: [
     storyWait(2000, ([component]) => {
@@ -138,7 +138,7 @@ export const simulationsWithLoadingDisable = makeStory(conf, {
   items: [
     {
       links: [{ type: 'grafana' }],
-    }
+    },
   ],
   simulations: [
     storyWait(2000, ([component]) => {
@@ -151,7 +151,7 @@ export const simulationsWithLoadingError = makeStory(conf, {
   items: [
     {
       links: [{ type: 'grafana' }],
-    }
+    },
   ],
   simulations: [
     storyWait(2000, ([component]) => {
@@ -196,7 +196,7 @@ export const simulationsWithWaitingToDisable = makeStory(conf, {
   ],
 });
 
-export const simulationsWithWaitingToRefresh = makeStory(conf, {
+export const simulationsWithWaitingToReset = makeStory(conf, {
   items: [
     {
       links: [grafanaLink],
@@ -205,7 +205,7 @@ export const simulationsWithWaitingToRefresh = makeStory(conf, {
   ],
   simulations: [
     storyWait(2000, ([component]) => {
-      component.waiting = 'refreshing';
+      component.waiting = 'reseting';
     }),
     storyWait(2000, ([component]) => {
       component.waiting = false;
@@ -266,7 +266,7 @@ export const simulationsWithErrorToDisable = makeStory(conf, {
   ],
 });
 
-export const simulationsWithErrorToRefresh = makeStory(conf, {
+export const simulationsWithErrorToReset = makeStory(conf, {
   items: [
     {
       links: [grafanaLink],
@@ -275,11 +275,11 @@ export const simulationsWithErrorToRefresh = makeStory(conf, {
   ],
   simulations: [
     storyWait(2000, ([component]) => {
-      component.waiting = 'refreshing';
+      component.waiting = 'reseting';
     }),
     storyWait(2000, ([component]) => {
       component.waiting = false;
-      component.error = 'refreshing';
+      component.error = 'reseting';
     }),
   ],
 });
@@ -292,19 +292,19 @@ enhanceStoriesNames({
   dataLoadedWithEnabled,
   skeletonWithWaitingEnabled,
   skeletonWithWaitingDisabled,
-  skeletonWithWaitingRefresh,
+  skeletonWithWaitingReset,
   errorWithEnabling,
   errorWithDisabling,
-  errorWithRefreshing,
+  errorWithReseting,
   errorWithLinkGrafanaEnabled,
   simulationsWithLoadingEnable,
   simulationsWithLoadingDisable,
   simulationsWithLoadingError,
   simulationsWithWaitingToEnable,
   simulationsWithWaitingToDisable,
-  simulationsWithWaitingToRefresh,
+  simulationsWithWaitingToReset,
   simulationsWithErrorToEnable,
   simulationsWithErrorEnablingLink,
   simulationsWithErrorToDisable,
-  simulationsWithErrorToRefresh,
+  simulationsWithErrorToReset,
 });

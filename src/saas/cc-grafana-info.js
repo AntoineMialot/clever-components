@@ -36,14 +36,14 @@ const GRAFANA_ADDON_SCREEN = new URL('../assets/addon.png', import.meta.url).hre
  *
  * @cssdisplay grid
  *
- * @prop {false|"refreshing"|"loading"|"disabling"|"enabling"|link-doc|link-grafana} error - Displays an error message.
+ * @prop {false|"reseting"|"loading"|"disabling"|"enabling"|link-doc|link-grafana} error - Displays an error message.
  * @prop {Link[]} links - Sets the different links.
  * @prop {null|"enabled"|"disabled"} status - Grafana acount status, is the Grafana enable or disable. Null means no data are received.
- * @prop {false|"refreshing"|"disabling"|"enabling"} waiting - are we waiting an action result response (refresh, disable or enable).
+ * @prop {false|"reseting"|"disabling"|"enabling"} waiting - are we waiting an action result response (reset, disable or enable).
  *
  * @event {CustomEvent} cc-grafana-info:enable - Fires when the enable button is clicked.
  * @event {CustomEvent} cc-grafana-info:disable - Fires when the disable button is clicked.
- * @event {CustomEvent} cc-grafana-info:refresh - Fires when the refresh button is clicked.
+ * @event {CustomEvent} cc-grafana-info:reset - Fires when the reset button is clicked.
  */
 export class CcGrafanaInfo extends LitElement {
 
@@ -67,8 +67,8 @@ export class CcGrafanaInfo extends LitElement {
     dispatchCustomEvent(this, 'enable');
   }
 
-  _onRefreshSubmit () {
-    dispatchCustomEvent(this, 'refresh');
+  _onResetSubmit () {
+    dispatchCustomEvent(this, 'reset');
   }
 
   _onDisableSubmit () {
@@ -173,13 +173,13 @@ export class CcGrafanaInfo extends LitElement {
             </cc-block-section>
 
             <cc-block-section>
-              <div slot="title">${i18n('cc-grafana-info.refresh-title')}</div>
-              <div slot="info">${i18n('cc-grafana-info.refresh-description')}</div>
-              ${this.error === 'refreshing' ? html`
-                <cc-error>${i18n('cc-grafana-info.error-refreshing')}</cc-error>
+              <div slot="title">${i18n('cc-grafana-info.reset-title')}</div>
+              <div slot="info">${i18n('cc-grafana-info.reset-description')}</div>
+              ${this.error === 'reseting' ? html`
+                <cc-error>${i18n('cc-grafana-info.error-reseting')}</cc-error>
               ` : html`
                 <div>
-                  <cc-button primary ?skeleton=${this._skeleton} ?disabled=${isFormDisabled} ?waiting=${this.waiting === 'refreshing'} @cc-button:click=${this._onRefreshSubmit}>${i18n('cc-grafana-info.refresh')}</cc-button>
+                  <cc-button primary ?skeleton=${this._skeleton} ?disabled=${isFormDisabled} ?waiting=${this.waiting === 'reseting'} @cc-button:click=${this._onResetSubmit}>${i18n('cc-grafana-info.reset')}</cc-button>
                 </div>
               `}
             </cc-block-section>
@@ -198,7 +198,7 @@ export class CcGrafanaInfo extends LitElement {
           ` : ''}
         `}
 
-        ${!this.waiting || this.waiting === 'refreshing' ? html`
+        ${!this.waiting || this.waiting === 'reseting' ? html`
           ${dashboards.map((item) => html`
             <cc-block-section>
               <div slot="title">${item.title}</div>
