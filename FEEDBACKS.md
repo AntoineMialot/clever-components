@@ -12,7 +12,8 @@
 * bouton enable => enable grafana
 * bouton rest => reset all dashboards
 * bouton disable => disable grafana
-* français
+* i18n français
+* penser à mettre des points à la fin de phrases
 * reseting => resetting
 * {Link[]} links
   * {String} link
