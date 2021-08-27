@@ -24,7 +24,7 @@ const conf = {
 // The first story in the file will appear before the API table in Storybook's docs page.
 // We call it the "default story" and it's used as the main presentation of your component.
 // You can set several instances/items to show different situations
-// but no need to get exhaustive or too detailed ;-)
+// but nuso need to get exhative or too detailed ;-)
 export const defaultStory = makeStory(conf, {
   items: [
     { one: 'Foo', two: true },

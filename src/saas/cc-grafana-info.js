@@ -117,11 +117,11 @@ export class CcGrafanaInfo extends LitElement {
           ${this.error === 'link-doc' ? html`
             <cc-error>${i18n('cc-grafana-info.error-link-doc')}</cc-error>
           ` : html`
-          <div>
-            ${ccLink(GRAFANA_DOCUMENTATION, html`
-              <cc-img src="${infoSvg}"></cc-img><span>${i18n('cc-grafana-info.link.doc')}</span>
-            `)}
-          </div>
+            <div>
+              ${ccLink(GRAFANA_DOCUMENTATION, html`
+                <cc-img src="${infoSvg}"></cc-img><span>${i18n('cc-grafana-info.link.doc')}</span>
+              `)}
+            </div>
           `}
         </cc-block-section>
 
@@ -133,10 +133,11 @@ export class CcGrafanaInfo extends LitElement {
         ` : html`
           ${!this.status ? html`
             <cc-block-section>
-            <div slot="title">${i18n('cc-grafana-info.loading-title')}</div>
-            <div>
-              <cc-loader></cc-loader> <span>${i18n('cc-grafana-info.loading-data')}</span>
-            </div>
+              <div slot="title">${i18n('cc-grafana-info.loading-title')}</div>
+              <div>
+                <cc-loader></cc-loader>
+                <span>${i18n('cc-grafana-info.loading-data')}</span>
+              </div>
             </cc-block-section>
           ` : ''}
 
@@ -147,9 +148,9 @@ export class CcGrafanaInfo extends LitElement {
               ${this.error === 'enabling' ? html`
                 <cc-error>${i18n('cc-grafana-info.error-enabling')}</cc-error>
               ` : html`
-              <div>
-                <cc-button success ?skeleton=${this._skeleton} ?disabled=${isFormDisabled} @cc-button:click=${this._onEnableSubmit}>${i18n('cc-grafana-info.enable')}</cc-button>
-              </div>
+                <div>
+                  <cc-button success ?skeleton=${this._skeleton} ?disabled=${isFormDisabled} @cc-button:click=${this._onEnableSubmit}>${i18n('cc-grafana-info.enable')}</cc-button>
+                </div>
               `}
             </cc-block-section>
           ` : ''}
@@ -161,14 +162,14 @@ export class CcGrafanaInfo extends LitElement {
               ${this.error === 'link-grafana' || grafanaLink == null ? html`
                 <cc-error>${i18n('cc-grafana-info.error-link-grafana')}</cc-error>
               ` : html`
-              <div>
-                ${grafanaLink != null ? html`
-                  ${ccLink(grafanaLink.href, html`
-                    <cc-img src="${GRAFANA_LOGO_URL}"></cc-img>
-                    <span class="${classMap({ skeleton: (grafanaLink.href == null) })}">${i18n('cc-grafana-info.link.grafana')}</span>
-                  `)}
-                ` : ''}
-              </div>
+                <div>
+                  ${grafanaLink != null ? html`
+                    ${ccLink(grafanaLink.href, html`
+                      <cc-img src="${GRAFANA_LOGO_URL}"></cc-img>
+                      <span class="${classMap({ skeleton: (grafanaLink.href == null) })}">${i18n('cc-grafana-info.link.grafana')}</span>
+                    `)}
+                  ` : ''}
+                </div>
               `}
             </cc-block-section>
 
@@ -223,7 +224,7 @@ export class CcGrafanaInfo extends LitElement {
       // language=CSS
       css`
         :host {
-          --cc-gap: 1em;
+          display: block;
         }
 
         cc-img {
