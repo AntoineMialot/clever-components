@@ -67,3 +67,5 @@ interface Options {
   apm: boolean,
 }
 
+export type OverlayType = 'restore'|'delete';
+

@@ -10,11 +10,6 @@ import { i18n } from '../lib/i18n.js';
 import { skeletonStyles } from '../styles/skeleton.js';
 import { ccLink, linkStyles } from '../templates/cc-link.js';
 
-/**
- * @typedef {import('./types.js').BackupDetails} BackupDetails
- * @typedef {import('./types.js').Backup} Backup
- * @typedef {'restore'|'delete'} OverlayType
- */
 
 const backupSvg = new URL('../assets/backup.svg', import.meta.url).href;
 const closeSvg = new URL('../assets/close.svg', import.meta.url).href;
@@ -32,6 +27,10 @@ const SKELETON_BACKUPS = {
  * ## Details
  *
  * * When `backups` is nullish, a skeleton screen UI pattern is displayed (loading hint).
+ *
+ * @typedef {import('./types.js').BackupDetails} BackupDetails
+ * @typedef {import('./types.js').Backup} Backup
+ * @typedef {import('./types.js').OverlayType} OverlayType
  *
  * @cssdisplay grid
  */
