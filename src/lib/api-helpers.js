@@ -86,6 +86,21 @@ export function fetchPriceSystem ({ signal, zoneId }) {
     .then(sendToApi({ signal, cacheDelay: ONE_DAY }));
 }
 
+// TODO: move to clever-client
+// Tmp Grafana API calls
+/**
+ * GET /v2/saas/grafana/{id}
+ * @param {Object} params
+ * @param {String} params.id
+ */
+ export function getGrafanaOrganisation (params) {
+  return Promise.resolve({
+    method: 'get',
+    url: `/v2/saas/grafana/${params.id}`,
+    headers: { Accept: 'application/json' }
+  });
+}
+
 const RATES = {
   EUR: 1,
   USD: 1.1802,
