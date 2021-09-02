@@ -10,7 +10,8 @@ defineComponent({
     selector: 'cc-grafana-info',
     params: {
         apiConfig: { type: Object },
-        ownerId: { type: String }
+        ownerId: { type: String },
+        grafanaBaseLink: {type: String}
     },
 
     onConnect(container, component, context$, disconnectSignal) {
@@ -37,7 +38,7 @@ defineComponent({
             }),
 
             // When we receive an update, on one of the component input or context we are looking at, apply this action
-            context$.subscribe(({ apiConfig, ownerId }) => {
+            context$.subscribe(({ apiConfig, ownerId, grafanaBaseLink }) => {
 
                 // Reset compontent to it's initial state on any change
                 component.status = null;
@@ -45,9 +46,9 @@ defineComponent({
                 component.waiting = false;
                 component.link = null;
                 
-                if (apiConfig != null && ownerId != null) {
+                if (apiConfig != null && ownerId != null && grafanaBaseLink != null) {
                     // On change, apply the CC API call
-                    grafanaId_lp.push((signal) => fetchGrafanaOrga({ apiConfig, signal, ownerId }));
+                    grafanaId_lp.push((signal) => fetchGrafanaOrga({ apiConfig, signal, ownerId, grafanaBaseLink }));
                 }
             }),
     
@@ -56,14 +57,13 @@ defineComponent({
     }
 })
 
-function fetchGrafanaOrga ({ apiConfig, signal, ownerId }) {
-    const grafanaLink ='https://my-grafana.com';
+function fetchGrafanaOrga ({ apiConfig, signal, ownerId, grafanaBaseLink }) {
     return getGrafanaOrganisation({ id: ownerId }).then(sendToApi({ apiConfig, signal }))
     .then(
         // Case when a valid object is return by the API
         (exposedVarsObject) => {
             console.log(exposedVarsObject)
-            return Object.create( { status:  "enabled", link: grafanaLink+ "/home?orgId=" + exposedVarsObject.id } );
+            return Object.create( { status:  "enabled", link: grafanaBaseLink+ "/home?orgId=" + exposedVarsObject.id } );
         },
         // Case when a valid error is returned by the API (not found)
         (error) => {
