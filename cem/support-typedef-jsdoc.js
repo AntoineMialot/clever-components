@@ -37,7 +37,9 @@ export default function supportTypedefJsdoc () {
                 const typeDefDisplay = tag.name.getText();
 
                 const url = new URL(moduleDoc.path, import.meta.url);
-                const typeUrl = new URL('types.d.ts', url.toString().split('/cem').join(''));
+                const path = tag.typeExpression.type.argument?.literal.getText().split('\'')[1] + '';
+                const convertedPath = path.substring(0, path.lastIndexOf('.'));
+                const typeUrl = new URL(convertedPath ? convertedPath + '.d.ts' : 'types.d.ts', url.toString().split('/cem').join(''));
                 const converted = convertFile(ts, typeUrl.pathname, typeDefDisplay);
 
                 const declaration = moduleDoc.declarations.find((declaration) => declaration.name === node.name.getText());
