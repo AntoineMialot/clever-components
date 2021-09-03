@@ -41,8 +41,9 @@ defineComponent({
 
       // Listen and apply a component action on errors
       error$.subscribe((error) => {
+        console.log(component)
         component.error = error.type;
-        component.saving = false;
+        component.waiting = false;
       }),
 
       // Final subscription when grafana async call return a valid value
@@ -81,11 +82,8 @@ defineComponent({
       onDisable$.subscribe(([variables, { apiConfig, ownerId }]) => {
 
         // Prepare disabling state
-        component.status = null;
         component.error = false;
-        component.link = null;
         component.waiting = "disabling";
-
 
         if (apiConfig != null && ownerId != null) {
           // On change, apply the CC API call on the Grafana object
@@ -101,9 +99,7 @@ defineComponent({
       onEnable$.subscribe(([variables, { apiConfig, ownerId, grafanaBaseLink }]) => {
 
         // Prepare enabling state
-        component.status = null;
         component.error = false;
-        component.link = null;
         component.waiting = "enabling";
 
         if (apiConfig != null && ownerId != null && grafanaBaseLink != null) {
@@ -170,14 +166,13 @@ function fetchDisableGrafanaOrga({ apiConfig, signal, ownerId }) {
     );
 }
 
-function fetchEnableGrafanaOrga({ apiConfig, signal, ownerId, grafanaBaseLink }) {
-  return createGrafanaOrganisation({ id: ownerId }).then(sendToApi({ apiConfig, signal }))
-    .then(
-      () => {
-        return fetchGrafanaOrga({ apiConfig, signal, ownerId, grafanaBaseLink })
-      }
-    );
+async function fetchEnableGrafanaOrga({ apiConfig, signal, ownerId, grafanaBaseLink }) {
+  // Wait for organization to be created
+  await createGrafanaOrganisation({ id: ownerId }).then(sendToApi({ apiConfig, signal }));
+  // Finally get the Grafana Organisation
+  return await fetchGrafanaOrga({ apiConfig, signal, ownerId, grafanaBaseLink });
 }
+
 
 function disabledGrafana() {
   return Object.create({ status: "disabled", link: null });
