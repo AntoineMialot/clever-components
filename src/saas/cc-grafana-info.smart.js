@@ -2,9 +2,10 @@
 import './cc-grafana-info.js';
 import '../smart/cc-smart-container.js';
 import { defineComponent } from '../lib/smart-manager.js';
-import { LastPromise, unsubscribeWithSignal } from '../lib/observables.js';
-import { getGrafanaOrganisation } from '../lib/api-helpers.js';
+import { fromCustomEvent, LastPromise, unsubscribeWithSignal, withLatestFrom, merge } from '../lib/observables.js';
+import { getGrafanaOrganisation, resetGrafanaOrga, deleteGrafanaOrganisation, createGrafanaOrganisation } from '../lib/api-helpers.js';
 import { sendToApi } from '../lib/send-to-api.js';
+import { addErrorType } from '../lib/utils.js';
 
 defineComponent({
   selector: 'cc-grafana-info',
@@ -15,40 +16,120 @@ defineComponent({
   },
 
   onConnect(container, component, context$, disconnectSignal) {
-    console.log({ container, component, context$, disconnectSignal })
-
     // LastPromise avoid some race condition that can happens on UI
     const grafanaId_lp = new LastPromise();
+    const reset_lp = new LastPromise();
+
+    // What happend on reset call
+    const onReset$ = fromCustomEvent(component, 'cc-grafana-info:reset')
+      .pipe(withLatestFrom(context$));
+
+    // What happend on disable call
+    const onDisable$ = fromCustomEvent(component, 'cc-grafana-info:disable')
+     .pipe(withLatestFrom(context$));
+
+     // What happend on enable call
+    const onEnable$ = fromCustomEvent(component, 'cc-grafana-info:enable')
+    .pipe(withLatestFrom(context$));
+
+    const error$ = merge(grafanaId_lp.error$, reset_lp.error$);
 
     // unsubscribeWithSignal will handle all signals unsubscribe call behind the scene (when component is out of the DOM)
     unsubscribeWithSignal(disconnectSignal, [
-
       // Always print some error's log to ease the debug
-      grafanaId_lp.error$.subscribe(console.error),
+      error$.subscribe(console.error),
 
       // Listen and apply a component action on errors
-      grafanaId_lp.error$.subscribe(() => (component.error = "loading")),
+      error$.subscribe((error) => {
+        component.error = error.type;
+        component.saving = false;
+      }),
 
-      // Final subscription when the async call return a valid value
+      // Final subscription when grafana async call return a valid value
       grafanaId_lp.value$.subscribe((product) => {
-        console.log("product")
-        console.log(product)
         component.status = product.status
-        component.link = product.link
+        if (component.status == "enabled" && product.link == null ) {
+          component.error = "link-grafana"
+        } else {
+          component.link = product.link
+        }
+        component.waiting = false
+      }),
+      
+      // Final subscription when reset async call return a valid value
+      reset_lp.value$.subscribe(() => {
+        component.waiting = false
+      }),
+
+      // Action to apply when reset is clicked
+      onReset$.subscribe(([variables, { apiConfig, ownerId }]) => {
+
+        // Prepare resetting state
+        component.error = false;
+        component.waiting = "resetting";
+
+        if (apiConfig != null && ownerId != null ) {
+          reset_lp.push(
+            (signal) => fetchResetGrafanaOrga({ apiConfig, signal, ownerId }).catch(addErrorType('resetting'))
+          );
+        } else {
+          component.error = "resetting";
+        }
+      }),
+
+      // Action to apply when disable is clicked
+      onDisable$.subscribe(([variables, { apiConfig, ownerId }]) => {
+
+        // Prepare disabling state
+        component.status = null;
+        component.error = false;
+        component.link = null;
+        component.waiting = "disabling";
+
+
+        if (apiConfig != null && ownerId != null) {
+          // On change, apply the CC API call on the Grafana object
+          grafanaId_lp.push(
+            (signal) => fetchDisableGrafanaOrga({ apiConfig, signal, ownerId }).catch(addErrorType('disabling'))
+          );
+        } else {
+          component.error = "disabling";
+        }
+      }),
+
+      // Action to apply when enable is clicked
+      onEnable$.subscribe(([variables, { apiConfig, ownerId, grafanaBaseLink }]) => {
+
+        // Prepare enabling state
+        component.status = null;
+        component.error = false;
+        component.link = null;
+        component.waiting = "enabling";
+
+        if (apiConfig != null && ownerId != null && grafanaBaseLink != null) {
+          // On change, apply the CC API call on the Grafana object
+          grafanaId_lp.push(
+            (signal) => fetchEnableGrafanaOrga({ apiConfig, signal, ownerId, grafanaBaseLink }).catch(addErrorType('enabling'))
+          );
+        } else {
+          component.error = "enabling";
+        }
       }),
 
       // When we receive an update, on one of the component input or context we are looking at, apply this action
       context$.subscribe(({ apiConfig, ownerId, grafanaBaseLink }) => {
 
-        // Reset compontent to it's initial state on any change
+        // Reset component to it's initial state before any change
         component.status = null;
         component.error = false;
         component.waiting = false;
         component.link = null;
 
         if (apiConfig != null && ownerId != null && grafanaBaseLink != null) {
-          // On change, apply the CC API call
-          grafanaId_lp.push((signal) => fetchGrafanaOrga({ apiConfig, signal, ownerId, grafanaBaseLink }));
+          // On change, apply the CC API call on the Grafana object
+          grafanaId_lp.push(
+            (signal) => fetchGrafanaOrga({ apiConfig, signal, ownerId, grafanaBaseLink }).catch(addErrorType('loading'))
+          );
         }
       }),
 
@@ -62,17 +143,54 @@ function fetchGrafanaOrga({ apiConfig, signal, ownerId, grafanaBaseLink }) {
     .then(
       // Case when a valid object is return by the API
       (exposedVarsObject) => {
-        console.log(exposedVarsObject)
-        return Object.create({ status: "enabled", link: grafanaBaseLink + "/home?orgId=" + exposedVarsObject.id });
+        return enabledGrafana(grafanaBaseLink, exposedVarsObject.id);
       },
       // Case when a valid error is returned by the API (not found)
       (error) => {
-        console.log("error in then")
         if (error.toString().startsWith("Error: Grafana organization not found")) {
-          return Object.create({ status: "disabled", link: null });
+          return disabledGrafana();
         } else {
           return error
         }
       },
     );
+}
+
+
+function fetchResetGrafanaOrga({ apiConfig, signal, ownerId }) {
+  return resetGrafanaOrga({ id: ownerId }).then(sendToApi({ apiConfig, signal }))
+    .then(
+      // Case when a valid object is return by the API
+      () => {
+        return {};
+      }
+    );
+}
+
+function fetchDisableGrafanaOrga({ apiConfig, signal, ownerId }) {
+  return deleteGrafanaOrganisation({ id: ownerId }).then(sendToApi({ apiConfig, signal }))
+    .then(
+      // Case when a valid object is return by the API
+      () => {
+        return disabledGrafana();
+      }
+    );
+}
+
+
+function fetchEnableGrafanaOrga({ apiConfig, signal, ownerId, grafanaBaseLink }) {
+  return createGrafanaOrganisation({ id: ownerId }).then(sendToApi({ apiConfig, signal }))
+    .then(
+      () => {
+        return fetchGrafanaOrga({ apiConfig, signal, ownerId, grafanaBaseLink })
+      }
+    );
+}
+
+function enabledGrafana(grafanaBaseLink, id) {
+  return Object.create({ status: "enabled", link: grafanaBaseLink + "/home?orgId=" + id });
+}
+
+function disabledGrafana() {
+  return Object.create({ status: "disabled", link: null });
 }

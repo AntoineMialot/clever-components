@@ -100,6 +100,42 @@ export function fetchPriceSystem ({ signal, zoneId }) {
     headers: { Accept: 'application/json' }
   });
 }
+/**
+ * POST /v2/saas/grafana/{id}
+ * @param {Object} params
+ * @param {String} params.id
+ */
+ export function createGrafanaOrganisation (params) {
+  return Promise.resolve({
+    method: 'post',
+    url: `/v2/saas/grafana/${params.id}`,
+    headers: { Accept: 'application/json' }
+  });
+}
+/**
+ * DELETE /v2/saas/grafana/{id}
+ * @param {Object} params
+ * @param {String} params.id
+ */
+ export function deleteGrafanaOrganisation (params) {
+  return Promise.resolve({
+    method: 'delete',
+    url: `/v2/saas/grafana/${params.id}`,
+    headers: { Accept: 'application/json' }
+  });
+}
+/**
+ * POST /v2/saas/grafana/{id}/reset
+ * @param {Object} params
+ * @param {String} params.id
+ */
+ export function resetGrafanaOrga (params) {
+  return Promise.resolve({
+    method: 'post',
+    url: `/v2/saas/grafana/${params.id}/reset`,
+    headers: { Accept: 'application/json' }
+  });
+}
 
 const RATES = {
   EUR: 1,
