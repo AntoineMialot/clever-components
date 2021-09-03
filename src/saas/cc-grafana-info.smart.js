@@ -26,11 +26,11 @@ defineComponent({
 
     // What happend on disable call
     const onDisable$ = fromCustomEvent(component, 'cc-grafana-info:disable')
-     .pipe(withLatestFrom(context$));
+      .pipe(withLatestFrom(context$));
 
-     // What happend on enable call
+    // What happend on enable call
     const onEnable$ = fromCustomEvent(component, 'cc-grafana-info:enable')
-    .pipe(withLatestFrom(context$));
+      .pipe(withLatestFrom(context$));
 
     const error$ = merge(grafanaId_lp.error$, reset_lp.error$);
 
@@ -48,14 +48,14 @@ defineComponent({
       // Final subscription when grafana async call return a valid value
       grafanaId_lp.value$.subscribe((product) => {
         component.status = product.status
-        if (component.status == "enabled" && product.link == null ) {
+        if (component.status == "enabled" && product.link == null) {
           component.error = "link-grafana"
         } else {
           component.link = product.link
         }
         component.waiting = false
       }),
-      
+
       // Final subscription when reset async call return a valid value
       reset_lp.value$.subscribe(() => {
         component.waiting = false
@@ -68,7 +68,7 @@ defineComponent({
         component.error = false;
         component.waiting = "resetting";
 
-        if (apiConfig != null && ownerId != null ) {
+        if (apiConfig != null && ownerId != null) {
           reset_lp.push(
             (signal) => fetchResetGrafanaOrga({ apiConfig, signal, ownerId }).catch(addErrorType('resetting'))
           );
@@ -143,7 +143,7 @@ function fetchGrafanaOrga({ apiConfig, signal, ownerId, grafanaBaseLink }) {
     .then(
       // Case when a valid object is return by the API
       (exposedVarsObject) => {
-        return enabledGrafana(grafanaBaseLink, exposedVarsObject.id);
+        return Object.create({ status: "enabled", link: grafanaBaseLink + "/home?orgId=" + exposedVarsObject.id });
       },
       // Case when a valid error is returned by the API (not found)
       (error) => {
@@ -156,15 +156,8 @@ function fetchGrafanaOrga({ apiConfig, signal, ownerId, grafanaBaseLink }) {
     );
 }
 
-
 function fetchResetGrafanaOrga({ apiConfig, signal, ownerId }) {
   return resetGrafanaOrga({ id: ownerId }).then(sendToApi({ apiConfig, signal }))
-    .then(
-      // Case when a valid object is return by the API
-      () => {
-        return {};
-      }
-    );
 }
 
 function fetchDisableGrafanaOrga({ apiConfig, signal, ownerId }) {
@@ -177,7 +170,6 @@ function fetchDisableGrafanaOrga({ apiConfig, signal, ownerId }) {
     );
 }
 
-
 function fetchEnableGrafanaOrga({ apiConfig, signal, ownerId, grafanaBaseLink }) {
   return createGrafanaOrganisation({ id: ownerId }).then(sendToApi({ apiConfig, signal }))
     .then(
@@ -185,10 +177,6 @@ function fetchEnableGrafanaOrga({ apiConfig, signal, ownerId, grafanaBaseLink })
         return fetchGrafanaOrga({ apiConfig, signal, ownerId, grafanaBaseLink })
       }
     );
-}
-
-function enabledGrafana(grafanaBaseLink, id) {
-  return Object.create({ status: "enabled", link: grafanaBaseLink + "/home?orgId=" + id });
 }
 
 function disabledGrafana() {
