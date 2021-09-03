@@ -24,8 +24,8 @@ export const disabled = makeStory(conf, {
   items: [{ disabled: true }],
 });
 
-export const strictMode = makeStory(conf, {
+export const dataLoadedWithStrictMode = makeStory(conf, {
   items: [{ mode: 'strict' }],
 });
 
-enhanceStoriesNames({ defaultStory, validationWithExistingNames, disabled, strictMode });
+enhanceStoriesNames({ defaultStory, validationWithExistingNames, disabled, dataLoadedWithStrictMode });
