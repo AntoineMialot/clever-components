@@ -15,8 +15,8 @@ interface AddonPlan {
   name: string,
 }
 
-export interface BackupDetails {
-  providerId: string,
+interface BackupDetails {
+  providerId: string, // test doc
   passwordForCommand: string,
   list: Backup[],
 }
