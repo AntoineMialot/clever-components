@@ -20,18 +20,18 @@ const SKELETON_ZONES = [];
 const CURRENCY_EUR = { code: 'EUR', changeRate: 1 };
 
 /**
- * @typedef {import('./types.js').Currency} Currency
- * @typedef {import('./types.js').Plan} Plan
- * @typedef {import('../types.js').Zone} Zone
- */
-
-/**
  * A component that displays a total price and allows the selection of a currency and a zone.
  *
  * @cssdisplay block
  *
  * @event {CustomEvent<Currency>} cc-pricing-header:change-currency - Fires the `currency` whenever the currency selection changes.
  * @event {CustomEvent<String>} cc-pricing-header:change-zone - Fires the `zoneId` (zone name) whenever the zone selection changes.
+ *
+ *
+ * @typedef {import('./types.js').Currency} Currency
+ * @typedef {import('./types.js').Plan} Plan
+ * @typedef {import('../types.js').Zone} Zone
+ *
  */
 export class CcPricingHeader extends LitElement {
 

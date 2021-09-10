@@ -44,8 +44,8 @@ export interface Option {
 }
 
 interface Feature {
-  name: String,
-  value: String,
+  name: string,
+  value: string,
 }
 
 interface Flavor {

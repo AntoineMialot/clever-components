@@ -1,14 +1,14 @@
 export interface Amount {
   amount: Number,
-  currency: String,
+  currency: string,
 }
 
 export interface Invoice {
-  downloadUrl: String,
-  emissionDate: String,
-  invoiceHtml: String,
-  number: String,
-  paymentUrl: String,
+  downloadUrl: string,
+  emissionDate: string,
+  invoiceHtml: string,
+  number: string,
+  paymentUrl: string,
   status: InvoiceStatus,
   total: Amount,
   type: InvoiceType,
