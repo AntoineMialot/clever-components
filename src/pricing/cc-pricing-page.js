@@ -9,7 +9,6 @@ const CURRENCY_EUR = { code: 'EUR', changeRate: '1' };
 
 /**
  * @typedef {import('./types.js').Currency} Currency
- * @typedef {import('./types.js').Plan} Plan
  * @typedef {import('../types.js').Zone} Zone
  */
 

@@ -17,6 +17,7 @@ const SKELETON_APPLICATIONS = [
 
 /**
  * @typedef {import('../types.js').Instance} Instance
+ * @typedef {import('../types.js').Application} Application
  * @typedef {import('../types.js').InstanceVariant} InstanceVariant
  * @typedef {import('../types.js').Zone} Zone
  */

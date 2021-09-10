@@ -1,13 +1,30 @@
 import { readFileSync } from 'fs';
 import path from 'path';
 
+const fileCache = new Map();
+const typeCache = new Map();
+
 function convertImports (ts, imports) {
   const asts = [];
-  imports.forEach((types, filename) => {
-    const sourceCode = readFileSync(filename).toString();
-    const sourceAst = ts.createSourceFile(filename, sourceCode, ts.ScriptTarget.ES2015, true);
-    const allTypes = [...types, ...findSubtypes(ts, sourceAst, sourceCode, types)];
-    allTypes.forEach((type) => asts.push(delint(ts, sourceAst, sourceCode, type)));
+  imports.forEach((typesSet, filename) => {
+    let sourceCode;
+    let sourceAst;
+    const inMemory = fileCache.get(filename);
+    if (!inMemory) {
+      sourceCode = readFileSync(filename).toString();
+      sourceAst = ts.createSourceFile(filename, sourceCode, ts.ScriptTarget.ES2015, true);
+      fileCache.set(filename, { code: sourceCode, ast: sourceAst });
+    }
+    else {
+      sourceCode = inMemory.code;
+      sourceAst = inMemory.ast;
+    }
+
+    findSubtypes(ts, sourceAst, sourceCode, Array.from(typesSet)).forEach((type) => typesSet.add(type));
+    typesSet.forEach((type) =>
+      (typeCache.has(type))
+        ? asts.push(typeCache.get(type))
+        : asts.push(delint(ts, sourceAst, sourceCode, type)));
   });
   return asts.join('\n');
 }
@@ -17,9 +34,11 @@ function delint (ts, node, code, interfaceName) {
   const st = node?.statements.find((st) => st.name.getText() === interfaceName);
   const start = st?.modifiers?.find((modifier) => modifier.kind === ts.SyntaxKind.ExportKeyword)?.end ?? st?.pos;
   const typeDeclaration = code.substring(start, st?.end).trim();
-  return '```ts\n'
+  const typeDisplay = '```ts\n'
     + typeDeclaration
     + '\n```';
+  typeCache.set(interfaceName, typeDisplay);
+  return typeDisplay;
 }
 
 function findSubtypes (ts, node, code, types) {
@@ -61,11 +80,11 @@ export default function supportTypedefJsdoc () {
           constructor?.body.statements.forEach((mb) => {
             const fieldName = mb?.expression?.left?.name.getText();
             const isFieldPrivate = fieldName?.[0] === '_';
-            const field = mb.jsDoc?.[0].tags?.[0].typeExpression;
+            const fieldDoc = mb.jsDoc?.[0].tags?.[0].typeExpression;
             // We need to have an or to find types who are object arrays e.g: Plan[] for example
-            const fieldType = field?.type?.typeName?.getText() || field?.type?.elementType?.typeName?.getText();
-            if (!isFieldPrivate && fieldType) {
-              types.push(fieldType);
+            const customType = fieldDoc?.type?.typeName?.getText() || fieldDoc?.type?.elementType?.typeName?.getText();
+            if (!isFieldPrivate && customType) {
+              types.push(customType);
             }
             // console.log(types);
           });
@@ -89,10 +108,10 @@ export default function supportTypedefJsdoc () {
                 // console.log(typeDefDisplay);
                 // console.log('ftype', type, 'typepath', typePath);
                 if (type != null) {
-                  const mapTypes = imports.get(typePath);
-                  (!mapTypes)
-                    ? imports.set(typePath, [type])
-                    : imports.set(typePath, [...mapTypes, type]);
+                  if (!imports.has(typePath)) {
+                    imports.set(typePath, new Set());
+                  }
+                  imports.get(typePath).add(type);
                 }
 
                 // console.log(imports);
@@ -101,7 +120,7 @@ export default function supportTypedefJsdoc () {
           });
           const convertedImports = convertImports(ts, imports);
           // console.log(convertedImports);
-          const displayText = (convertedImports) ? '###Type Definitions\n\n' + convertedImports : '';
+          const displayText = (convertedImports) ? '### Type Definitions\n\n' + convertedImports : '';
           const declaration = moduleDoc.declarations.find((declaration) => declaration.name === node.name.getText());
 
           declaration.description = declaration.description + '\n\n' + displayText;
