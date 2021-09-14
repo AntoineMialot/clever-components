@@ -3,7 +3,6 @@ import '../molecules/cc-block-section.js';
 import '../molecules/cc-block.js';
 import '../molecules/cc-error.js';
 import { css, html, LitElement } from 'lit-element';
-import { classMap } from 'lit-html/directives/class-map.js';
 import { dispatchCustomEvent } from '../lib/events.js';
 import { i18n } from '../lib/i18n.js';
 import { skeletonStyles } from '../styles/skeleton.js';
@@ -12,10 +11,10 @@ import { ccLink, linkStyles } from '../templates/cc-link.js';
 const infoSvg = new URL('../assets/info.svg', import.meta.url).href;
 
 const GRAFANA_LOGO_URL = 'https://static-assets.cellar.services.clever-cloud.com/logos/grafana.svg';
+const GRAFANA_HOME_SCREEN = 'https://static-assets.cellar.services.clever-cloud.com/grafana/screens/home.png';
+const GRAFANA_RUNTIME_SCREEN = 'https://static-assets.cellar.services.clever-cloud.com/grafana/screens/runtime.png';
+const GRAFANA_ADDON_SCREEN = 'https://static-assets.cellar.services.clever-cloud.com/grafana/screens/addon.png';
 const GRAFANA_DOCUMENTATION = 'https://www.clever-cloud.com/doc/administrate/metrics/overview/';
-const GRAFANA_ORG_SCREEN = new URL('../assets/organization.png', import.meta.url).href;
-const GRAFANA_APPLICATION_SCREEN = new URL('../assets/application.png', import.meta.url).href;
-const GRAFANA_ADDON_SCREEN = new URL('../assets/addon.png', import.meta.url).href;
 
 /**
  * A component to display information about grafana and allow some actions: enable, disable, reset.
@@ -67,13 +66,13 @@ export class CcGrafanaInfo extends LitElement {
     const dashboards = [
       {
         title: i18n('cc-grafana-info.organization-title'),
-        url: GRAFANA_ORG_SCREEN,
+        url: GRAFANA_HOME_SCREEN,
         description: i18n('cc-grafana-info.organization-description'),
         alt: 'grafana main organization dashboard',
       },
       {
         title: i18n('cc-grafana-info.runtime-title'),
-        url: GRAFANA_APPLICATION_SCREEN,
+        url: GRAFANA_RUNTIME_SCREEN,
         description: i18n('cc-grafana-info.runtime-description'),
         alt: 'grafana application runtime dashboard',
       },

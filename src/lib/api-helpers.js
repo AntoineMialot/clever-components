@@ -93,11 +93,11 @@ export function fetchPriceSystem ({ signal, zoneId }) {
  * @param {Object} params
  * @param {String} params.id
  */
- export function getGrafanaOrganisation (params) {
+export function getGrafanaOrganisation (params) {
   return Promise.resolve({
     method: 'get',
     url: `/v2/saas/grafana/${params.id}`,
-    headers: { Accept: 'application/json' }
+    headers: { Accept: 'application/json' },
   });
 }
 /**
@@ -105,11 +105,11 @@ export function fetchPriceSystem ({ signal, zoneId }) {
  * @param {Object} params
  * @param {String} params.id
  */
- export function createGrafanaOrganisation (params) {
+export function createGrafanaOrganisation (params) {
   return Promise.resolve({
     method: 'post',
     url: `/v2/saas/grafana/${params.id}`,
-    headers: { Accept: 'application/json' }
+    headers: { Accept: 'application/json' },
   });
 }
 /**
@@ -117,11 +117,11 @@ export function fetchPriceSystem ({ signal, zoneId }) {
  * @param {Object} params
  * @param {String} params.id
  */
- export function deleteGrafanaOrganisation (params) {
+export function deleteGrafanaOrganisation (params) {
   return Promise.resolve({
     method: 'delete',
     url: `/v2/saas/grafana/${params.id}`,
-    headers: { Accept: 'application/json' }
+    headers: { Accept: 'application/json' },
   });
 }
 /**
@@ -129,11 +129,11 @@ export function fetchPriceSystem ({ signal, zoneId }) {
  * @param {Object} params
  * @param {String} params.id
  */
- export function resetGrafanaOrga (params) {
+export function resetGrafanaOrga (params) {
   return Promise.resolve({
     method: 'post',
     url: `/v2/saas/grafana/${params.id}/reset`,
-    headers: { Accept: 'application/json' }
+    headers: { Accept: 'application/json' },
   });
 }
 
